@@ -49,8 +49,8 @@ tBody.addEventListener('click', function (event) {
 deleteConfirm.addEventListener('click', function (event) {
     if (event.target.dataset.action === 'confirm' && idsToDelete.length > 0) {
         $.ajax({
-            url: '/handler.php',
-            method: 'get',
+            url: '/delete_user.php',
+            method: 'post',
             dataType: 'html',
             data: {ids: idsToDelete},
             success: function (data) {
