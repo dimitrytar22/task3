@@ -7,6 +7,7 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="assets/styles/style.css">
 </head>
 <body>
 
@@ -19,7 +20,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="user-form">
                         <div class="mb-3">
                             <label for="first-name" class="col-form-label">First Name:</label>
                             <input type="text" class="form-control" id="first-name">
@@ -29,30 +30,30 @@
                             <input type="text" class="form-control" id="last-name">
                         </div>
                         <div class="mb-3">
-                            <label for="flexSwitchCheckChecked" class="col-form-label">Status:</label>
+                            <label for="status" class="col-form-label">Status:</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                                <input class="form-check-input"  type="checkbox" id="status" checked>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="role" class="col-form-label">Role:</label>
-                            <select class="w-50 form-select" aria-label="Default select example">
-                                <option selected id="role">Please select</option>
-                                <option value="1">Admin</option>
-                                <option value="2">User</option>
+                            <select class="w-50 form-select" aria-label="Default select example"id="role">
+                                <option selected value="0" >Please select</option>
+                                <option >Admin</option>
+                                <option >User</option>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-primary" id="save-button" >Save</button>
                 </div>
             </div>
         </div>
     </div>
     <div class="d-grid gap-2 d-md-block">
-        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#user-modal">Add</button>
+        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#user-modal" id="user-store">Add</button>
     </div>
 
 
@@ -110,17 +111,17 @@
                 <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
             </th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>
+            <td id="first-name">Mark</td>
+            <td id="last-name">Otto</td>
+            <td id="status">
                 <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
                      viewBox="0 0 16 16">
                     <circle cx="7" cy="7" r="7"/>
                 </svg>
             </td>
-            <td>User</td>
+            <td id="role">User</td>
             <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#user-modal" data-action="edit"  alt="edit">
+                     data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
                 <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
             </td>
@@ -129,16 +130,16 @@
             <th scope="row"><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
             </th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>
+            <td id="first-name">Jacob</td>
+            <td id="last-name">Thornton</td>
+            <td id="status">
                 <svg xmlns="http://www.w3.org/2000/svg"  id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
                      viewBox="0 0 16 16">
                     <circle cx="7" cy="7" r="7"/>
                 </svg>
             </td>
-            <td>Admin</td>
-            <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+            <td id="role">Admin</td>
+            <td><img src="assets/images/edit.png"id="user-update"  class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#user-modal" data-id="1" data-action="edit" alt="edit">
                 <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#delete-confirm-modal" data-id="1" data-action="delete" alt="delete">
@@ -148,17 +149,17 @@
             <th scope="row"><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
             </th>
-            <td>Larry the Bird</td>
-            <td>Larry the Bird3</td>
-            <td>
+            <td id="first-name">Larry the Bird</td>
+            <td id="last-name">Larry the Bird3</td>
+            <td id="status">
                 <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
                      viewBox="0 0 16 16">
                     <circle cx="7" cy="7" r="7"/>
                 </svg>
             </td>
-            <td>Admin</td>
+            <td id="role">Admin</td>
 
-            <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+            <td><img src="assets/images/edit.png"id="user-update"  class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#user-modal" data-id="1" data-action="edit" alt="edit">
                 <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#delete-confirm-modal" data-id="1" data-action="delete" alt="delete">
