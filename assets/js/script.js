@@ -11,6 +11,7 @@ const warning = $('#warning-modal');
 let idsToDelete = [];
 let elementsToDelete = [];
 let currentAction = null;
+let elementToUpdate = null;
 selectAllCheckbox.addEventListener('change', function (event) {
     let checked = event.target.checked;
     let rows = table.getElementsByTagName('tbody')[0].children;
@@ -88,9 +89,7 @@ saveButton.addEventListener('click', function (event) {
                 success: function (data) {
                     data = JSON.parse(data)
                     console.log(data);
-                    let elem = document.createElement('tr');
-                    elem.setAttribute('data-id', 1);
-                    elem.innerHTML = `<th scope="row">
+                    let elem = `<tr  data-id="1"> <th scope="row">
                 <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
             </th>
@@ -108,8 +107,8 @@ saveButton.addEventListener('click', function (event) {
                 <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
             </td>
-       `;
-                    tBody.append(elem);
+       </tr>`;
+                    tBody.innerHTML += elem;
                     userModal.modal('hide');
                 }
             });
@@ -122,6 +121,13 @@ saveButton.addEventListener('click', function (event) {
                 data: data,
                 success: function (data) {
                     console.log(JSON.parse(data));
+                    data = JSON.parse(data);
+                    let elem = elementToUpdate;
+                    elem.querySelector('#first-name').innerText = data.first_name;
+                    elem.querySelector('#last-name').innerText = data.last_name;
+                    elem.querySelector('#status').setAttribute('fill', data.status === 'true' ? 'green' : 'gray');
+                    elem.querySelector('#role').innerText = data.role;
+                    userModal.modal('hide');
                 }
             });
             break;
@@ -155,6 +161,8 @@ userModal.on('shown.bs.modal', function (event) {
 
 
         currentAction = 'update';
+        elementToUpdate = event.relatedTarget.closest('tr');
+
     }
 });
 groupActionsButton.addEventListener('click', function (event) {

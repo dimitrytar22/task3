@@ -113,7 +113,7 @@
             </th>
             <td id="first-name">Mark</td>
             <td id="last-name">Otto</td>
-            <td id="status">
+            <td>
                 <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
                      viewBox="0 0 16 16">
                     <circle cx="7" cy="7" r="7"/>
