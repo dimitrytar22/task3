@@ -72,6 +72,23 @@
         </div>
     </div>
 
+    <div class="modal fade" id="warning-modal" tabindex="-1" aria-labelledby="warning-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="warning-modal-label">Warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <table class="table" id="users">
         <thead>
         <tr>
@@ -96,13 +113,13 @@
             <td>Mark</td>
             <td>Otto</td>
             <td>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-circle-fill"
+                <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
                      viewBox="0 0 16 16">
                     <circle cx="7" cy="7" r="7"/>
                 </svg>
             </td>
             <td>User</td>
-            <td id="actions"><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+            <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#user-modal" data-action="edit"  alt="edit">
                 <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
@@ -115,7 +132,7 @@
             <td>Jacob</td>
             <td>Thornton</td>
             <td>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-circle-fill"
+                <svg xmlns="http://www.w3.org/2000/svg"  id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
                      viewBox="0 0 16 16">
                     <circle cx="7" cy="7" r="7"/>
                 </svg>
@@ -134,14 +151,14 @@
             <td>Larry the Bird</td>
             <td>Larry the Bird3</td>
             <td>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-circle-fill"
+                <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
                      viewBox="0 0 16 16">
                     <circle cx="7" cy="7" r="7"/>
                 </svg>
             </td>
             <td>Admin</td>
 
-            <td ><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+            <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#user-modal" data-id="1" data-action="edit" alt="edit">
                 <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                      data-bs-target="#delete-confirm-modal" data-id="1" data-action="delete" alt="delete">
@@ -150,14 +167,14 @@
         </tbody>
     </table>
     <div class="container">
-        <select class="w-25 form-select" aria-label="Default select example">
+        <select class="w-25 form-select" aria-label="Default select example" id="group-actions" >
             <option selected>Please select</option>
             <option value="1">Set active</option>
             <option value="2">Set not active</option>
             <option value="3">Delete</option>
         </select>
         <div class="d-grid gap-2 d-md-block mt-2">
-            <button class="btn btn-primary" type="button">Ok</button>
+            <button class="btn btn-primary" type="button" id="group-actions-button" >Ok</button>
         </div>
     </div>
 </div>
