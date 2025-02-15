@@ -22,3 +22,11 @@ function getAllUsers(){
     }
     return $users;
 }
+
+function storeUser(array $arr){
+    global $connection;
+
+    $preparedUser = $connection->prepare('Insert into users(first_name, last_name,status,role) values(:first_name, :last_name, :status, :role)');
+    $preparedUser->execute($arr);
+    return $connection->lastInsertId();
+}

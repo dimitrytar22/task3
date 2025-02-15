@@ -1,9 +1,8 @@
 <?php
-require_once 'connection.php';
 require_once 'functions.php';
 
 $userFields = [
-    'id' => htmlspecialchars(trim($_POST['id'])),
+    'id' => htmlspecialchars(intval($_POST['id'])),
     'first_name' => htmlspecialchars(trim($_POST['first_name'])),
     'last_name' => htmlspecialchars(trim($_POST['last_name'])),
     'status' => ((int)boolval(htmlspecialchars(trim($_POST['status'])))),
@@ -13,7 +12,7 @@ $userFields = [
 
 $emptyFieldsExist = false;
 foreach ($userFields as $key => $value) {
-    if(empty(($value)))
+    if(empty(($value)) && $key != 'status')
         $emptyFieldsExist = true;
 }
 if (!$emptyFieldsExist)

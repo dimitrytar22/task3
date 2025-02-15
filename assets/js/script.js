@@ -89,26 +89,35 @@ saveButton.addEventListener('click', function (event) {
                 success: function (data) {
                     data = JSON.parse(data)
                     console.log(data);
-                    let elem = `<tr  data-id="1"> <th scope="row">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    if (!data.error) {
 
-            </th>
-            <td id="first-name">${data.first_name}</td>
-            <td id="last-name">${data.last_name}</td>
-            <td id="status">
-                <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="${data.status === 'true' ? 'green' : 'gray'}" class="bi bi-circle-fill"
-                     viewBox="0 0 16 16">
-                    <circle cx="7" cy="7" r="7"/>
-                </svg>
-            </td>
-            <td id="role">${data.role}</td>
-            <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
-                <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
-            </td>
-       </tr>`;
-                    tBody.innerHTML += elem;
+                        let id = data.id;
+                        let firstName = form.find('input#first-name').val();
+                        let lastName = form.find('input#last-name').val();
+                        let status = form.find('input#status').prop('checked');
+                        let role = form.find('select#role').val();
+
+                        let elem = `<tr  data-id="${id}"> <th scope="row">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+
+                        </th>
+                        <td id="first-name">${firstName}</td>
+                        <td id="last-name">${lastName}</td>
+                        <td id="status">
+                            <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="${status === true ? 'green' : 'gray'}" class="bi bi-circle-fill"
+                                 viewBox="0 0 16 16">
+                                <circle cx="7" cy="7" r="7"/>
+                            </svg>
+                        </td>
+                        <td id="role">${role}</td>
+                        <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                                 data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
+                            <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                                 data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
+                        </td>
+                   </tr>`;
+                        tBody.innerHTML += elem;
+                    }
                     userModal.modal('hide');
                 }
             });

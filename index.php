@@ -123,7 +123,7 @@ $users = getAllUsers();
                             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
                         </th>
-                        <td id="first-name"><?=$user['first_name']?></td>
+                        <td id="first-name"><?=$user['first_name'] ?></td>
                         <td id="last-name"><?=$user['last_name']?></td>
                         <td>
                             <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="<?=$user['status'] == 1 ? 'green' : 'gray'?>"
