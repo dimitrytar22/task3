@@ -1,3 +1,7 @@
+<?php
+require_once "functions.php";
+$users = getAllUsers();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,28 +36,30 @@
                         <div class="mb-3">
                             <label for="status" class="col-form-label">Status:</label>
                             <div class="form-check form-switch">
-                                <input class="form-check-input"  type="checkbox" id="status" checked>
+                                <input class="form-check-input" type="checkbox" id="status" checked>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="role" class="col-form-label">Role:</label>
-                            <select class="w-50 form-select" aria-label="Default select example"id="role">
-                                <option selected value="0" >Please select</option>
-                                <option >Admin</option>
-                                <option >User</option>
+                            <select class="w-50 form-select" aria-label="Default select example" id="role">
+                                <option selected value="0">Please select</option>
+                                <option>Admin</option>
+                                <option>User</option>
                             </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="save-button" >Save</button>
+                    <button type="button" class="btn btn-primary" id="save-button">Save</button>
                 </div>
             </div>
         </div>
     </div>
     <div class="d-grid gap-2 d-md-block">
-        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#user-modal" id="user-store">Add</button>
+        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#user-modal"
+                id="user-store">Add
+        </button>
     </div>
 
 
@@ -66,7 +72,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-action="cancel">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-action="cancel">
+                        Cancel
+                    </button>
                     <button type="button" class="btn btn-primary btn-danger" data-action="confirm">Delete</button>
                 </div>
             </div>
@@ -105,77 +113,48 @@
         </tr>
         </thead>
         <tbody>
-        <tr  data-id="1">
+            <?php
 
-            <th scope="row">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                foreach ($users as $user) {
+            ?>
+                    <tr data-id="<?=$user['id']?>">
 
-            </th>
-            <td id="first-name">Mark</td>
-            <td id="last-name">Otto</td>
-            <td>
-                <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
-                     viewBox="0 0 16 16">
-                    <circle cx="7" cy="7" r="7"/>
-                </svg>
-            </td>
-            <td id="role">User</td>
-            <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
-                <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
-            </td>
-        </tr>
-        <tr  data-id="2">
-            <th scope="row"><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        <th scope="row">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
-            </th>
-            <td id="first-name">Jacob</td>
-            <td id="last-name">Thornton</td>
-            <td id="status">
-                <svg xmlns="http://www.w3.org/2000/svg"  id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
-                     viewBox="0 0 16 16">
-                    <circle cx="7" cy="7" r="7"/>
-                </svg>
-            </td>
-            <td id="role">Admin</td>
-            <td><img src="assets/images/edit.png"id="user-update"  class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#user-modal" data-id="1" data-action="edit" alt="edit">
-                <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#delete-confirm-modal" data-id="1" data-action="delete" alt="delete">
-            </td>
-        </tr>
-        <tr  data-id="3">
-            <th scope="row"><input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                        </th>
+                        <td id="first-name"><?=$user['first_name']?></td>
+                        <td id="last-name"><?=$user['last_name']?></td>
+                        <td>
+                            <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="<?=$user['status'] == 1 ? 'green' : 'gray'?>"
+                                 class="bi bi-circle-fill"
+                                 viewBox="0 0 16 16">
+                                <circle cx="7" cy="7" r="7"/>
+                            </svg>
+                        </td>
+                        <td id="role"><?=$user['role']?></td>
+                        <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                                 data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
+                            <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                                 data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
+                        </td>
+                    </tr>
+            <?php
+                }
+            ?>
 
-            </th>
-            <td id="first-name">Larry the Bird</td>
-            <td id="last-name">Larry the Bird3</td>
-            <td id="status">
-                <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="green" class="bi bi-circle-fill"
-                     viewBox="0 0 16 16">
-                    <circle cx="7" cy="7" r="7"/>
-                </svg>
-            </td>
-            <td id="role">Admin</td>
 
-            <td><img src="assets/images/edit.png"id="user-update"  class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#user-modal" data-id="1" data-action="edit" alt="edit">
-                <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                     data-bs-target="#delete-confirm-modal" data-id="1" data-action="delete" alt="delete">
-            </td>
-        </tr>
         </tbody>
     </table>
     <div class="container">
-        <select class="w-25 form-select" aria-label="Default select example" id="group-actions" >
+        <select class="w-25 form-select" aria-label="Default select example" id="group-actions">
             <option selected>Please select</option>
             <option value="1">Set active</option>
             <option value="2">Set not active</option>
             <option value="3">Delete</option>
         </select>
         <div class="d-grid gap-2 d-md-block mt-2">
-            <button class="btn btn-primary" type="button" id="group-actions-button" >Ok</button>
+            <button class="btn btn-primary" type="button" id="group-actions-button">Ok</button>
         </div>
     </div>
 </div>

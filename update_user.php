@@ -2,20 +2,22 @@
 require_once 'connection.php';
 require_once 'functions.php';
 
-$id = htmlspecialchars(trim($_POST['id']));
-$firstName = htmlspecialchars(trim($_POST['first_name']));
-$lastName = htmlspecialchars(trim($_POST['last_name']));
-$status = htmlspecialchars(trim($_POST['status']));
-$role = htmlspecialchars(ucfirst(trim($_POST['role'])));
-
 $userFields = [
-    'id' => $id,
-    'first_name' => $firstName,
-    'last_name' => $lastName,
-    'status' => ((int)boolval($status)),
-    'role' => $role,
+    'id' => htmlspecialchars(trim($_POST['id'])),
+    'first_name' => htmlspecialchars(trim($_POST['first_name'])),
+    'last_name' => htmlspecialchars(trim($_POST['last_name'])),
+    'status' => ((int)boolval(htmlspecialchars(trim($_POST['status'])))),
+    'role' => htmlspecialchars(ucfirst(trim($_POST['role']))),
 ];
-$result = updateUser($userFields);
+
+
+$emptyFieldsExist = false;
+foreach ($userFields as $key => $value) {
+    if(empty(($value)))
+        $emptyFieldsExist = true;
+}
+if (!$emptyFieldsExist)
+    $result = updateUser($userFields);
 
 $response = [
     'status' => (bool)$result,

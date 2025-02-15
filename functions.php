@@ -1,7 +1,6 @@
 <?php
 require_once 'connection.php';
-function updateUser(array $arr)
-{
+function updateUser(array $arr){
     global $connection;
     $preparedUser = $connection->prepare('Select * from users where id = ?');
     $preparedUser->execute([$arr['id']]);
@@ -12,4 +11,14 @@ function updateUser(array $arr)
     Update users set first_name = :first_name, last_name = :last_name, status = :status, role = :role where id = :id");
     $prepared->execute($arr);
     return $prepared->errorCode();
+}
+
+function getAllUsers(){
+    global $connection;
+    $users = [];
+    $result = $connection->query("Select * from users;");
+    while($user = $result->fetch(PDO::FETCH_ASSOC)){
+        $users[] = $user;
+    }
+    return $users;
 }
