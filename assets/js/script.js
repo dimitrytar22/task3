@@ -76,7 +76,7 @@ saveButton.addEventListener('click', function (event) {
     let data = {
         'first_name': form.find('input#first-name').val(),
         'last_name': form.find('input#last-name').val(),
-        'status': form.find('input#status').prop('checked'),
+        'status': Number(form.find('input#status').prop('checked')),
         'role': form.find('select#role').val(),
     };
     switch (currentAction) {
@@ -114,19 +114,24 @@ saveButton.addEventListener('click', function (event) {
             });
             break;
         case 'update':
+            data.id = elementToUpdate.dataset.id;
+
             $.ajax({
                 url: '/update_user.php',
                 method: 'post',
                 dataType: 'html',
                 data: data,
                 success: function (data) {
-                    console.log(JSON.parse(data));
                     data = JSON.parse(data);
-                    let elem = elementToUpdate;
-                    elem.querySelector('#first-name').innerText = data.first_name;
-                    elem.querySelector('#last-name').innerText = data.last_name;
-                    elem.querySelector('#status').setAttribute('fill', data.status === 'true' ? 'green' : 'gray');
-                    elem.querySelector('#role').innerText = data.role;
+                    console.log(data);
+                    if (data.status) {
+                        let user = data.user;
+                        let elem = elementToUpdate;
+                        elem.querySelector('#first-name').innerText = user.first_name;
+                        elem.querySelector('#last-name').innerText = user.last_name;
+                        elem.querySelector('#status').setAttribute('fill', user.status === 1 ? 'green' : 'gray');
+                        elem.querySelector('#role').innerText = user.role;
+                    }
                     userModal.modal('hide');
                 }
             });
