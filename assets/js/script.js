@@ -8,8 +8,8 @@ const saveButton = document.getElementById('save-button');
 const userModal = $('#user-modal');
 const warning = $('#warning-modal');
 
-let idsToDelete = [];
-let elementsToDelete = [];
+let selectedIds = [];
+let selectedElements = [];
 let currentAction = null;
 let elementToUpdate = null;
 selectAllCheckbox.addEventListener('change', function (event) {
@@ -38,45 +38,53 @@ tBody.addEventListener('change', function (event) {
 tBody.addEventListener('click', function (event) {
     let action = event.target.dataset.action;
     if (action === 'edit') {
+        selectedElements.push(event.target.closest('tr'))
 
     } else if (action === 'delete') {
         let elem = event.target.closest('tr');
         let id = elem.dataset.id;
-        idsToDelete.push(id);
-        elementsToDelete.push(elem);
+        selectedIds.push(id);
+        selectedElements.push(elem);
     }
 });
 deleteConfirm.addEventListener('click', function (event) {
-    if (event.target.dataset.action === 'confirm' && idsToDelete.length > 0) {
+    let modal = $(this);
+    if (event.target.dataset.action === 'confirm' && selectedIds.length > 0) {
         $.ajax({
             url: '/delete_user.php',
             method: 'post',
-            dataType: 'html',
-            data: {ids: idsToDelete},
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({user_ids: selectedIds}),
             success: function (data) {
-                console.log(JSON.parse(data));
-                elementsToDelete.forEach((elem) => {
-                    elem.remove();
-                });
+                console.log(data);
+                if (data.status) {
+                    selectedElements.forEach((elem) => {
+                        elem.remove();
+                    });
+                }
+                modal.modal('hide');
             }
         });
 
     }
-    $(this).modal('hide');
+    modal.modal('hide');
 });
 deleteConfirm.addEventListener('hidden.bs.modal', function () {
-    idsToDelete = [];
-    elementsToDelete = [];
+    selectedIds = [];
+    selectedElements = [];
+
 });
 userModal.on('hidden.bs.modal', function () {
     currentAction = null;
+    elementToUpdate = null;
 });
 saveButton.addEventListener('click', function (event) {
     let form = userModal.find('form#user-form');
-    let data = {
+    let user = {
         'first_name': form.find('input#first-name').val(),
         'last_name': form.find('input#last-name').val(),
-        'status': Number(form.find('input#status').prop('checked')),
+        'status': (form.find('input#status').prop('checked')),
         'role': form.find('select#role').val(),
     };
     switch (currentAction) {
@@ -84,64 +92,44 @@ saveButton.addEventListener('click', function (event) {
             $.ajax({
                 url: '/store_user.php',
                 method: 'post',
-                dataType: 'html',
-                data: data,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({user}),
                 success: function (data) {
-                    data = JSON.parse(data)
                     console.log(data);
-                    if (!data.error) {
+                    if (data.status) {
+                        let userData = {
+                            id: data.id,
+                            first_name: form.find('input#first-name').val(),
+                            last_name: form.find('input#last-name').val(),
+                            status: form.find('input#status').prop('checked'),
+                            role: form.find('select#role').val()
+                        }
+                        addUser(userData, table);
 
-                        let id = data.id;
-                        let firstName = form.find('input#first-name').val();
-                        let lastName = form.find('input#last-name').val();
-                        let status = form.find('input#status').prop('checked');
-                        let role = form.find('select#role').val();
-
-                        let elem = `<tr  data-id="${id}"> <th scope="row">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-
-                        </th>
-                        <td id="first-name">${firstName}</td>
-                        <td id="last-name">${lastName}</td>
-                        <td id="status">
-                            <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="${status === true ? 'green' : 'gray'}" class="bi bi-circle-fill"
-                                 viewBox="0 0 16 16">
-                                <circle cx="7" cy="7" r="7"/>
-                            </svg>
-                        </td>
-                        <td id="role">${role}</td>
-                        <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                                 data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
-                            <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                                 data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
-                        </td>
-                   </tr>`;
-                        tBody.innerHTML += elem;
                     }
                     userModal.modal('hide');
                 }
             });
             break;
         case 'update':
-            data.id = elementToUpdate.dataset.id;
+            user.id = elementToUpdate.dataset.id;
 
             $.ajax({
                 url: '/update_user.php',
                 method: 'post',
-                dataType: 'html',
-                data: data,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(user),
                 success: function (data) {
-                    data = JSON.parse(data);
                     console.log(data);
                     if (data.status) {
-                        let user = data.user;
-                        let elem = elementToUpdate;
-                        elem.querySelector('#first-name').innerText = user.first_name;
-                        elem.querySelector('#last-name').innerText = user.last_name;
-                        elem.querySelector('#status').setAttribute('fill', user.status === 1 ? 'green' : 'gray');
-                        elem.querySelector('#role').innerText = user.role;
+                        let users = data.user;
+
+                        updateUser(elementToUpdate, user);
+                        userModal.modal('hide');
+                        selectedElements = [];
                     }
-                    userModal.modal('hide');
                 }
             });
             break;
@@ -149,6 +137,7 @@ saveButton.addEventListener('click', function (event) {
             break;
     }
 });
+
 warning.on('hidden.bs.modal', function () {
     let warningBody = $('#warning-modal #modal-body');
     warningBody.text("");
@@ -192,28 +181,97 @@ groupActionsButton.addEventListener('click', function (event) {
         warning.modal('show');
         return;
     }
-    let selectedUsers = tBody.querySelectorAll('input:checked');
+    let selectedUsers = [];
+    tBody.querySelectorAll('input:checked').forEach(function (item) {
+        selectedUsers.push(item.closest('tr'));
+    });
+
+    let users = [];
     switch (+groupActions.value) {
         case 1:
             selectedUsers.forEach((item) => {
-                let tr = item.closest('tr');
-                let status = tr.querySelector('td svg#status');
-                status.setAttribute('fill', 'green');
+
+                let id = item.dataset.id;
+                let first_name = item.querySelector('td#first-name').innerText;
+                let last_name = item.querySelector('td#last-name').innerText;
+                let status = item.querySelector('td svg#status');
+                let role = item.querySelector('td#role').innerText;
+
+                let user = {
+                    id,
+                    first_name,
+                    last_name,
+                    status: true,
+                    role
+                };
+                users.push(user);
+
+            });
+            $.ajax({
+                url: '/update_user.php',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({users}),
+                success: function (data) {
+                    console.log(data)
+                    if (data.status) {
+                        selectedUsers.forEach(function (user) {
+                            user.querySelector('#status').setAttribute('fill', 'green');
+
+                        });
+                    }
+
+
+                    userModal.modal('hide');
+                }
             });
             break;
         case 2:
             selectedUsers.forEach((item) => {
-                let tr = item.closest('tr');
-                let status = tr.querySelector('td svg#status');
-                status.setAttribute('fill', 'gray');
+
+                let id = item.dataset.id;
+                let first_name = item.querySelector('td#first-name').innerText;
+                let last_name = item.querySelector('td#last-name').innerText;
+                let status = item.querySelector('td svg#status');
+                let role = item.querySelector('td#role').innerText;
+
+                let user = {
+                    id,
+                    first_name,
+                    last_name,
+                    status: false,
+                    role
+                };
+                users.push(user);
+
+            });
+            $.ajax({
+                url: '/update_user.php',
+                method: 'post',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({users}),
+                success: function (data) {
+                    console.log(data)
+                    if (data.status) {
+                        selectedUsers.forEach(function (user) {
+                            user.querySelector('#status').setAttribute('fill', 'gray');
+
+                        });
+                    }
+
+
+                    userModal.modal('hide');
+                }
             });
             break;
         case 3:
             $('#delete-confirm-modal').modal('show');
             selectedUsers.forEach((item) => {
-                let tr = item.closest('tr');
-                idsToDelete.push(tr.dataset.id);
-                elementsToDelete.push(tr);
+
+                selectedIds.push(item.dataset.id);
+                selectedElements.push(item);
             });
             break;
         default:
@@ -226,4 +284,38 @@ const allCheckboxesSelected = function (tBody) {
     let checkboxCount = tBody.querySelectorAll('input').length;
     let selectedCheckboxCount = tBody.querySelectorAll('input:checked').length;
     return checkboxCount !== selectedCheckboxCount;
+}
+
+const updateUser = function (element, user) {
+
+    element.querySelector('#first-name').innerText = user.first_name;
+    element.querySelector('#last-name').innerText = user.last_name;
+    element.querySelector('#status').setAttribute('fill', user.status === true ? 'green' : 'gray');
+    element.querySelector('#role').innerText = user.role;
+
+
+}
+const addUser = function (data, table) {
+    let tBody = table.querySelector('tbody');
+
+    let elem = `<tr  data-id="${data['id']}"> <th scope="row">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+
+                        </th>
+                        <td id="first-name">${data['first_name']}</td>
+                        <td id="last-name">${data['last_name']}</td>
+                        <td id="status">
+                            <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="${data['status'] === true ? 'green' : 'gray'}" class="bi bi-circle-fill"
+                                 viewBox="0 0 16 16">
+                                <circle cx="7" cy="7" r="7"/>
+                            </svg>
+                        </td>
+                        <td id="role">${data['role']}</td>
+                        <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                                 data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
+                            <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                                 data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
+                        </td>
+                   </tr>`;
+    tBody.innerHTML += elem;
 }
