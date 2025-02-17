@@ -98,6 +98,7 @@ deleteConfirm.addEventListener('shown.bs.modal', function () {
 userModal.on('hidden.bs.modal', function () {
     currentAction = null;
     elementToUpdate = null;
+    selectedElements = [];
 });
 saveButton.addEventListener('click', function (event) {
     let form = userModal.find('form#user-form');
@@ -227,7 +228,7 @@ groupActionsButtons.forEach(function (button) {
         let users = [];
         switch (+groupActions.value) {
             case 1:
-                selectedUsers.forEach((item) => {
+                selectedElements.forEach((item) => {
 
                     let id = item.dataset.id;
 
@@ -264,13 +265,18 @@ groupActionsButtons.forEach(function (button) {
                             });
                         }
 
-
                         userModal.modal('hide');
+                    }, complete: function (){
+
+                        selectedElements = [];
                     }
+
                 });
+
+
                 break;
             case 2:
-                selectedUsers.forEach((item) => {
+                selectedElements.forEach((item) => {
 
                     let id = item.dataset.id;
 
@@ -309,6 +315,9 @@ groupActionsButtons.forEach(function (button) {
 
 
                         userModal.modal('hide');
+                    }, complete: function (){
+
+                        selectedElements = [];
                     }
                 });
                 break;
