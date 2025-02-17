@@ -47,7 +47,6 @@ tBody.addEventListener('click', function (event) {
         let id = elem.dataset.id;
         selectedIds.push(id);
         selectedElements.push(elem);
-        console.log(selectedElements)
     }
 });
 deleteConfirm.addEventListener('click', function (event) {
@@ -67,19 +66,20 @@ deleteConfirm.addEventListener('click', function (event) {
                         elem.remove();
                     });
                 }
+                if (tBody.querySelectorAll('tr').length === 0) {
+                    selectAllCheckbox.checked = false;
+                }
                 modal.modal('hide');
             }
         });
 
-    }else if(event.target.dataset.action === 'cancel')
+    } else if (event.target.dataset.action === 'cancel')
         modal.modal('hide');
 
 });
 deleteConfirm.addEventListener('hidden.bs.modal', function () {
     selectedIds = [];
     selectedElements = [];
-
-
 
 
 });
@@ -111,12 +111,12 @@ saveButton.addEventListener('click', function (event) {
     let emptyFields = false;
 
     for (const [key, value] of Object.entries(user)) {
-        console.log(value + ' ' + Boolean(Number(value)))
-        if((!Boolean(value) || value === '0') && key !== 'status'){
+        if ((!Boolean(value) || value === '0') && key !== 'status') {
             emptyFields = true;
         }
-    };
-    if(emptyFields){
+    }
+    ;
+    if (emptyFields) {
         warningBody.text("Fill all data!");
         warning.modal('show');
         return;
@@ -140,6 +140,7 @@ saveButton.addEventListener('click', function (event) {
                             role: form.find('select#role').val()
                         }
                         addUser(userData, table);
+                        updateUser(tBody.lastElementChild, userData);
 
                     }
                     userModal.modal('hide');
@@ -266,7 +267,7 @@ groupActionsButtons.forEach(function (button) {
                         }
 
                         userModal.modal('hide');
-                    }, complete: function (){
+                    }, complete: function () {
 
                         selectedElements = [];
                     }
@@ -308,14 +309,16 @@ groupActionsButtons.forEach(function (button) {
                         console.log(data)
                         if (data.status) {
                             selectedElements.forEach(function (user) {
+                                console.log(user)
                                 user.querySelector('#status').setAttribute('fill', 'gray');
 
                             });
+
                         }
 
 
                         userModal.modal('hide');
-                    }, complete: function (){
+                    }, complete: function () {
 
                         selectedElements = [];
                     }
@@ -341,7 +344,7 @@ const allCheckboxesSelected = function (tBody) {
 const updateUser = function (element, user) {
 
 
-    element.querySelector('#first-name').innerText = user.first_name + " " +user.last_name;
+    element.querySelector('#first-name').innerText = user.first_name + " " + user.last_name;
     element.querySelector('#status').setAttribute('fill', user.status === true ? 'green' : 'gray');
     element.querySelector('#role').innerText = user.role;
 
@@ -350,23 +353,27 @@ const updateUser = function (element, user) {
 const addUser = function (data, table) {
     let tBody = table.querySelector('tbody');
 
-    let elem = `<tr  data-id="${data['id']}"> <th scope="row">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+    let elem = document.createElement('tr');
+    elem.setAttribute('data-id', data['id']);
+    elem.innerHTML = `
+        <th scope="row">
+            <input class="form-check-input" type="checkbox">
+        </th>
+        <td id="first-name">${data['first_name']} ${data['last_name']}</td>
+        <td id="status">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${data['status'] ? 'green' : 'gray'}" class="bi bi-circle-fill">
+                <circle cx="7" cy="7" r="7"/>
+            </svg>
+        </td>
+        <td id="role">${data['role']}</td>
+        <td>
+            <img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                 data-bs-target="#user-modal" data-action="edit" alt="edit">
+            <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
+                 data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
+        </td>
+    `;
 
-                        </th>
-                        <td id="first-name">${data['first_name']} ${data['last_name']}</td>
-                        <td id="status">
-                            <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="${data['status'] === true ? 'green' : 'gray'}" class="bi bi-circle-fill"
-                                 viewBox="0 0 16 16">
-                                <circle cx="7" cy="7" r="7"/>
-                            </svg>
-                        </td>
-                        <td id="role">${data['role']}</td>
-                        <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                                 data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
-                            <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                                 data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
-                        </td>
-                   </tr>`;
-    tBody.innerHTML += elem;
-}
+    tBody.appendChild(elem);
+};
+
