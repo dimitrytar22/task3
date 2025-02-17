@@ -108,12 +108,13 @@ saveButton.addEventListener('click', function (event) {
         'role': form.find('select#role').val(),
     };
     let emptyFields = false;
-    Object.values(user).forEach(function (item){
-        console.log(item + ' ' + Boolean(Number(item)))
-        if(!Boolean(item) || item === '0'){
+
+    for (const [key, value] of Object.entries(user)) {
+        console.log(value + ' ' + Boolean(Number(value)))
+        if((!Boolean(value) || value === '0') && key !== 'status'){
             emptyFields = true;
         }
-    });
+    };
     if(emptyFields){
         warningBody.text("Fill all data!");
         warning.modal('show');
