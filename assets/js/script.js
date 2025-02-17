@@ -45,10 +45,12 @@ tBody.addEventListener('click', function (event) {
         let id = elem.dataset.id;
         selectedIds.push(id);
         selectedElements.push(elem);
+        console.log(selectedElements)
     }
 });
 deleteConfirm.addEventListener('click', function (event) {
     let modal = $(this);
+
     if (event.target.dataset.action === 'confirm' && selectedIds.length > 0) {
         $.ajax({
             url: '/delete_user.php',
@@ -67,13 +69,29 @@ deleteConfirm.addEventListener('click', function (event) {
             }
         });
 
-    }
-    modal.modal('hide');
+    }else if(event.target.dataset.action === 'cancel')
+        modal.modal('hide');
+
 });
 deleteConfirm.addEventListener('hidden.bs.modal', function () {
     selectedIds = [];
     selectedElements = [];
 
+
+
+
+});
+deleteConfirm.addEventListener('shown.bs.modal', function () {
+    deleteConfirm.querySelector('#modal-body').innerHTML = "You want to delete users:<br>";
+    selectedElements.forEach((item) => {
+        let full_name = item.querySelector('#first-name').innerText.split(' ');
+        let id = item.dataset.id;
+        let first_name = full_name[0];
+        let last_name = full_name[1];
+        deleteConfirm.querySelector('#modal-body').innerHTML += `<b>ID:</b> ${id} <b>${first_name} ${last_name}</b><br>`;
+        selectedIds.push(id);
+        selectedElements.push(item);
+    });
 });
 userModal.on('hidden.bs.modal', function () {
     currentAction = null;
@@ -187,9 +205,9 @@ groupActionsButtons.forEach(function (button) {
             warning.modal('show');
             return;
         }
-        let selectedUsers = [];
+        // selectedElements = [];
         tBody.querySelectorAll('input:checked').forEach(function (item) {
-            selectedUsers.push(item.closest('tr'));
+            selectedElements.push(item.closest('tr'));
         });
 
         let users = [];
@@ -225,7 +243,7 @@ groupActionsButtons.forEach(function (button) {
                     success: function (data) {
                         console.log(data)
                         if (data.status) {
-                            selectedUsers.forEach(function (user) {
+                            selectedElements.forEach(function (user) {
                                 console.log(user)
                                 user.querySelector('#status').setAttribute('fill', 'green');
 
@@ -269,7 +287,7 @@ groupActionsButtons.forEach(function (button) {
                     success: function (data) {
                         console.log(data)
                         if (data.status) {
-                            selectedUsers.forEach(function (user) {
+                            selectedElements.forEach(function (user) {
                                 user.querySelector('#status').setAttribute('fill', 'gray');
 
                             });
@@ -282,11 +300,7 @@ groupActionsButtons.forEach(function (button) {
                 break;
             case 3:
                 $('#delete-confirm-modal').modal('show');
-                selectedUsers.forEach((item) => {
 
-                    selectedIds.push(item.dataset.id);
-                    selectedElements.push(item);
-                });
                 break;
             default:
                 console.log('unknown option')
