@@ -2,8 +2,8 @@ const table = document.getElementById('users');
 const tBody = table.getElementsByTagName('tbody')[0];
 const selectAllCheckbox = document.getElementById('select-all');
 const deleteConfirm = document.getElementById('delete-confirm-modal');
-const groupActions = document.getElementById('group-actions');
-const groupActionsButton = document.getElementById('group-actions-button');
+// const groupActions = document.getElementById('group-actions');
+const groupActionsButtons = document.querySelectorAll('#group-actions-button');
 const saveButton = document.getElementById('save-button');
 const userModal = $('#user-modal');
 const warning = $('#warning-modal');
@@ -168,118 +168,123 @@ userModal.on('shown.bs.modal', function (event) {
 
     }
 });
-groupActionsButton.addEventListener('click', function (event) {
-    if (tBody.querySelectorAll('input:checked').length <= 0) {
-        let warningBody = $('#warning-modal #modal-body');
-        warningBody.text("User not selected");
-        warning.modal('show');
-        return;
-    }
-    if (!Number.isInteger(+groupActions.value)) {
-        let warningBody = $('#warning-modal #modal-body');
-        warningBody.text("Action not selected");
-        warning.modal('show');
-        return;
-    }
-    let selectedUsers = [];
-    tBody.querySelectorAll('input:checked').forEach(function (item) {
-        selectedUsers.push(item.closest('tr'));
+groupActionsButtons.forEach(function (button) {
+
+    let groupActions = button.parentNode.querySelector("#group-actions");
+    button.addEventListener('click', function (event) {
+        if (tBody.querySelectorAll('input:checked').length <= 0) {
+            let warningBody = $('#warning-modal #modal-body');
+            warningBody.text("User not selected");
+            warning.modal('show');
+            return;
+        }
+        if (!Number.isInteger(+groupActions.value)) {
+            let warningBody = $('#warning-modal #modal-body');
+            warningBody.text("Action not selected");
+            warning.modal('show');
+            return;
+        }
+        let selectedUsers = [];
+        tBody.querySelectorAll('input:checked').forEach(function (item) {
+            selectedUsers.push(item.closest('tr'));
+        });
+
+        let users = [];
+        switch (+groupActions.value) {
+            case 1:
+                selectedUsers.forEach((item) => {
+
+                    let id = item.dataset.id;
+                    let first_name = item.querySelector('td#first-name').innerText;
+                    let last_name = item.querySelector('td#last-name').innerText;
+                    let status = item.querySelector('td svg#status');
+                    let role = item.querySelector('td#role').innerText;
+
+                    let user = {
+                        id,
+                        first_name,
+                        last_name,
+                        status: true,
+                        role
+                    };
+                    users.push(user);
+
+                });
+                $.ajax({
+                    url: '/update_user.php',
+                    method: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({users}),
+                    success: function (data) {
+                        console.log(data)
+                        if (data.status) {
+                            selectedUsers.forEach(function (user) {
+                                console.log(user)
+                                user.querySelector('#status').setAttribute('fill', 'green');
+
+                            });
+                        }
+
+
+                        userModal.modal('hide');
+                    }
+                });
+                break;
+            case 2:
+                selectedUsers.forEach((item) => {
+
+                    let id = item.dataset.id;
+                    let first_name = item.querySelector('td#first-name').innerText;
+                    let last_name = item.querySelector('td#last-name').innerText;
+                    let status = item.querySelector('td svg#status');
+                    let role = item.querySelector('td#role').innerText;
+
+                    let user = {
+                        id,
+                        first_name,
+                        last_name,
+                        status: false,
+                        role
+                    };
+                    users.push(user);
+
+                });
+                $.ajax({
+                    url: '/update_user.php',
+                    method: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({users}),
+                    success: function (data) {
+                        console.log(data)
+                        if (data.status) {
+                            selectedUsers.forEach(function (user) {
+                                user.querySelector('#status').setAttribute('fill', 'gray');
+
+                            });
+                        }
+
+
+                        userModal.modal('hide');
+                    }
+                });
+                break;
+            case 3:
+                $('#delete-confirm-modal').modal('show');
+                selectedUsers.forEach((item) => {
+
+                    selectedIds.push(item.dataset.id);
+                    selectedElements.push(item);
+                });
+                break;
+            default:
+                console.log('unknown option')
+                break;
+        }
     });
 
-    let users = [];
-    switch (+groupActions.value) {
-        case 1:
-            selectedUsers.forEach((item) => {
-
-                let id = item.dataset.id;
-                let first_name = item.querySelector('td#first-name').innerText;
-                let last_name = item.querySelector('td#last-name').innerText;
-                let status = item.querySelector('td svg#status');
-                let role = item.querySelector('td#role').innerText;
-
-                let user = {
-                    id,
-                    first_name,
-                    last_name,
-                    status: true,
-                    role
-                };
-                users.push(user);
-
-            });
-            $.ajax({
-                url: '/update_user.php',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify({users}),
-                success: function (data) {
-                    console.log(data)
-                    if (data.status) {
-                        selectedUsers.forEach(function (user) {
-                            user.querySelector('#status').setAttribute('fill', 'green');
-
-                        });
-                    }
-
-
-                    userModal.modal('hide');
-                }
-            });
-            break;
-        case 2:
-            selectedUsers.forEach((item) => {
-
-                let id = item.dataset.id;
-                let first_name = item.querySelector('td#first-name').innerText;
-                let last_name = item.querySelector('td#last-name').innerText;
-                let status = item.querySelector('td svg#status');
-                let role = item.querySelector('td#role').innerText;
-
-                let user = {
-                    id,
-                    first_name,
-                    last_name,
-                    status: false,
-                    role
-                };
-                users.push(user);
-
-            });
-            $.ajax({
-                url: '/update_user.php',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify({users}),
-                success: function (data) {
-                    console.log(data)
-                    if (data.status) {
-                        selectedUsers.forEach(function (user) {
-                            user.querySelector('#status').setAttribute('fill', 'gray');
-
-                        });
-                    }
-
-
-                    userModal.modal('hide');
-                }
-            });
-            break;
-        case 3:
-            $('#delete-confirm-modal').modal('show');
-            selectedUsers.forEach((item) => {
-
-                selectedIds.push(item.dataset.id);
-                selectedElements.push(item);
-            });
-            break;
-        default:
-            console.log('unknown option')
-            break;
-    }
 });
-
 const allCheckboxesSelected = function (tBody) {
     let checkboxCount = tBody.querySelectorAll('input').length;
     let selectedCheckboxCount = tBody.querySelectorAll('input:checked').length;
@@ -287,6 +292,7 @@ const allCheckboxesSelected = function (tBody) {
 }
 
 const updateUser = function (element, user) {
+
 
     element.querySelector('#first-name').innerText = user.first_name;
     element.querySelector('#last-name').innerText = user.last_name;
