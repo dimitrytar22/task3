@@ -100,12 +100,12 @@ $users = getAllUsers();
 
     <div class="modal fade" id="warning-modal" tabindex="-1" aria-labelledby="warning-modal-label" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
+            <div class="modal-content ">
+                <div class="modal-header bg-warning">
                     <h5 class="modal-title" id="warning-modal-label">Warning</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="modal-body">
+                <div class="modal-body " id="modal-body">
 
                 </div>
                 <div class="modal-footer">

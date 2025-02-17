@@ -7,6 +7,8 @@ const groupActionsButtons = document.querySelectorAll('#group-actions-button');
 const saveButton = document.getElementById('save-button');
 const userModal = $('#user-modal');
 const warning = $('#warning-modal');
+const warningBody = $('#warning-modal #modal-body');
+
 
 let selectedIds = [];
 let selectedElements = [];
@@ -105,6 +107,18 @@ saveButton.addEventListener('click', function (event) {
         'status': (form.find('input#status').prop('checked')),
         'role': form.find('select#role').val(),
     };
+    let emptyFields = false;
+    Object.values(user).forEach(function (item){
+        console.log(item + ' ' + Boolean(Number(item)))
+        if(!Boolean(item) || item === '0'){
+            emptyFields = true;
+        }
+    });
+    if(emptyFields){
+        warningBody.text("Fill all data!");
+        warning.modal('show');
+        return;
+    }
     switch (currentAction) {
         case 'store':
             $.ajax({
@@ -157,7 +171,6 @@ saveButton.addEventListener('click', function (event) {
 });
 
 warning.on('hidden.bs.modal', function () {
-    let warningBody = $('#warning-modal #modal-body');
     warningBody.text("");
 });
 userModal.on('shown.bs.modal', function (event) {
