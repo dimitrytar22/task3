@@ -157,8 +157,11 @@ userModal.on('shown.bs.modal', function (event) {
     } else if (action === 'user-update') {
         let row = event.relatedTarget.closest('tr');
         let data = [];
-        form.find('input#first-name').val(row.querySelector('#first-name').innerText);
-        form.find('input#last-name').val(row.querySelector('#last-name').innerText);
+        let full_name = row.querySelector('#first-name').innerText.split(' ');
+        let first_name = full_name[0];
+        let last_name = full_name[1];
+        form.find('input#first-name').val(first_name);
+        form.find('input#last-name').val(last_name);
         form.find('input#status').prop('checked', row.querySelector('#status[fill]').getAttribute('fill') === 'green');
         form.find('select#role').val(row.querySelector('#role').innerText);
 
@@ -195,8 +198,11 @@ groupActionsButtons.forEach(function (button) {
                 selectedUsers.forEach((item) => {
 
                     let id = item.dataset.id;
-                    let first_name = item.querySelector('td#first-name').innerText;
-                    let last_name = item.querySelector('td#last-name').innerText;
+
+                    let full_name = item.querySelector('td#first-name').innerText.split(' ');
+                    let first_name = full_name[0];
+                    let last_name = full_name[1];
+
                     let status = item.querySelector('td svg#status');
                     let role = item.querySelector('td#role').innerText;
 
@@ -235,10 +241,14 @@ groupActionsButtons.forEach(function (button) {
                 selectedUsers.forEach((item) => {
 
                     let id = item.dataset.id;
-                    let first_name = item.querySelector('td#first-name').innerText;
-                    let last_name = item.querySelector('td#last-name').innerText;
+
+                    let full_name = item.querySelector('td#first-name').innerText.split(' ');
+                    let first_name = full_name[0];
+                    let last_name = full_name[1];
+
                     let status = item.querySelector('td svg#status');
                     let role = item.querySelector('td#role').innerText;
+
 
                     let user = {
                         id,
@@ -294,8 +304,7 @@ const allCheckboxesSelected = function (tBody) {
 const updateUser = function (element, user) {
 
 
-    element.querySelector('#first-name').innerText = user.first_name;
-    element.querySelector('#last-name').innerText = user.last_name;
+    element.querySelector('#first-name').innerText = user.first_name + " " +user.last_name;
     element.querySelector('#status').setAttribute('fill', user.status === true ? 'green' : 'gray');
     element.querySelector('#role').innerText = user.role;
 
@@ -308,8 +317,7 @@ const addUser = function (data, table) {
                         <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
                         </th>
-                        <td id="first-name">${data['first_name']}</td>
-                        <td id="last-name">${data['last_name']}</td>
+                        <td id="first-name">${data['first_name']} ${data['last_name']}</td>
                         <td id="status">
                             <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16" fill="${data['status'] === true ? 'green' : 'gray'}" class="bi bi-circle-fill"
                                  viewBox="0 0 16 16">
