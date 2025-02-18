@@ -261,6 +261,7 @@ groupActionsButtons.forEach(function (button) {
                     success: function (data) {
                         console.log(data)
                         if (data.status) {
+                            console.log(selectedElements)
                             selectedElements.forEach(function (user) {
                                 console.log(user)
                                 user.querySelector('#status').setAttribute('fill', 'green');
@@ -369,8 +370,8 @@ const addUser = function (data, table) {
             <input class="form-check-input" type="checkbox">
         </th>
         <td id="first-name">${data['first_name']} ${data['last_name']}</td>
-        <td id="status">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="${data['status'] ? 'green' : 'gray'}" class="bi bi-circle-fill">
+        <td>
+            <svg xmlns="http://www.w3.org/2000/svg"  id="status" width="16" height="16" fill="${data['status'] ? 'green' : 'gray'}" class="bi bi-circle-fill">
                 <circle cx="7" cy="7" r="7"/>
             </svg>
         </td>
@@ -384,5 +385,6 @@ const addUser = function (data, table) {
     `;
 
     tBody.appendChild(elem);
+    console.log(tBody)
 };
 
