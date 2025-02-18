@@ -115,7 +115,7 @@ saveButton.addEventListener('click', function (event) {
             emptyFields = true;
         }
     }
-    ;
+
     if (emptyFields) {
         warningBody.text("Fill all data!");
         warning.modal('show');
@@ -141,7 +141,9 @@ saveButton.addEventListener('click', function (event) {
                         }
                         addUser(userData, table);
                         updateUser(tBody.lastElementChild, userData);
-
+                        if(selectAllCheckbox.checked){
+                            selectAllCheckboxes(tBody);
+                        }
                     }
                     userModal.modal('hide');
                 }
@@ -339,6 +341,13 @@ const allCheckboxesSelected = function (tBody) {
     let checkboxCount = tBody.querySelectorAll('input').length;
     let selectedCheckboxCount = tBody.querySelectorAll('input:checked').length;
     return checkboxCount !== selectedCheckboxCount;
+}
+const selectAllCheckboxes = function (tBody){
+    let checkboxes = tBody.querySelectorAll('input')
+    checkboxes.forEach(function (item){
+       item.setAttribute('checked', 'checked');
+    });
+
 }
 
 const updateUser = function (element, user) {
