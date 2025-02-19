@@ -2,7 +2,7 @@ const table = document.getElementById('users');
 const tBody = table.getElementsByTagName('tbody')[0];
 const selectAllCheckbox = document.getElementById('select-all');
 const deleteConfirm = document.getElementById('delete-confirm-modal');
-// const groupActions = document.getElementById('group-actions');
+const userStoreButton = document.getElementById('user-store');
 const groupActionsButtons = document.querySelectorAll('#group-actions-button');
 const saveButton = document.getElementById('save-button');
 const userModal = $('#user-modal');
@@ -39,8 +39,16 @@ tBody.addEventListener('change', function (event) {
 
 tBody.addEventListener('click', function (event) {
     let action = event.target.dataset.action;
+    let tr = event.target.closest('tr');
+    let user = {
+        id: tr.dataset.id,
+        first_name: tr.querySelector('#first-name').innerText
+    }
+
     if (action === 'edit') {
-        selectedElements.push(event.target.closest('tr'))
+        selectedElements.push(event.target.closest('tr'));
+        userModal.find('#user-modal-title').html(`Update User <b>ID: </b>${user.id} <b>Name: </b>${user.first_name}`);
+
 
     } else if (action === 'delete') {
         let elem = event.target.closest('tr');
@@ -100,6 +108,10 @@ userModal.on('hidden.bs.modal', function () {
     elementToUpdate = null;
     selectedElements = [];
 });
+userStoreButton.addEventListener('click', function (){
+    userModal.find('#user-modal-title').text("Create User");
+
+});
 saveButton.addEventListener('click', function (event) {
     let form = userModal.find('form#user-form');
     let user = {
@@ -151,7 +163,6 @@ saveButton.addEventListener('click', function (event) {
             break;
         case 'update':
             user.id = elementToUpdate.dataset.id;
-
             $.ajax({
                 url: '/update_user.php',
                 method: 'post',
@@ -192,6 +203,8 @@ userModal.on('shown.bs.modal', function (event) {
         currentAction = 'store';
     } else if (action === 'user-update') {
         let row = event.relatedTarget.closest('tr');
+
+        console.log(event)
         let data = [];
         let full_name = row.querySelector('#first-name').innerText.split(' ');
         let first_name = full_name[0];
@@ -378,7 +391,7 @@ const addUser = function (data, table) {
         <td id="role">${data['role']}</td>
         <td>
             <img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                 data-bs-target="#user-modal" data-action="edit" alt="edit">
+                 data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
             <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
                  data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
         </td>
