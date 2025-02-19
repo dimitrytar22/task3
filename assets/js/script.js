@@ -390,10 +390,11 @@ const addUser = function (data, table) {
         </td>
         <td id="role">${data['role']}</td>
         <td>
-            <img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                 data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
-            <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                 data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
+            <i class="fas fa-edit" data-bs-toggle="modal"
+                       data-bs-target="#user-modal" data-action="edit" id="user-update" style="font-size:24px"></i>
+
+                    <i class="fa-solid fa-trash " data-bs-toggle="modal"
+                       data-bs-target="#delete-confirm-modal" data-action="delete" id="user-delete" style="font-size:24px"></i>
         </td>
     `;
 

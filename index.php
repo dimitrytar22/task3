@@ -12,6 +12,7 @@ $users = getAllUsers();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="assets/styles/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
 
@@ -149,10 +150,12 @@ $users = getAllUsers();
                     </svg>
                 </td>
                 <td id="role"><?= $user['role'] ?></td>
-                <td><img src="assets/images/edit.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                         data-bs-target="#user-modal" data-action="edit" id="user-update" alt="edit">
-                    <img src="assets/images/delete.png" class="img-fluid cursor-pointer" data-bs-toggle="modal"
-                         data-bs-target="#delete-confirm-modal" data-action="delete" alt="delete">
+                <td><i class="fas fa-edit" data-bs-toggle="modal"
+                       data-bs-target="#user-modal" data-action="edit" id="user-update" style="font-size:24px"></i>
+
+                    <i class="fa-solid fa-trash"data-bs-toggle="modal"
+                       data-bs-target="#delete-confirm-modal" data-action="delete" id="user-delete" style="font-size:24px"></i>
+
                 </td>
             </tr>
             <?php
