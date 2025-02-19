@@ -108,20 +108,41 @@ userModal.on('hidden.bs.modal', function () {
     elementToUpdate = null;
     selectedElements = [];
 });
-userStoreButton.addEventListener('click', function (){
+userStoreButton.addEventListener('click', function () {
     userModal.find('#user-modal-title').text("Create User");
 
 });
+const showFormErrors = function (fields){
+    fields.forEach(function (item) {
+        if ((!item.value && item.id !== 'status') || ( item.tagName === "SELECT" && item.value === '0')) {
+            let invalidInput = item.parentElement.querySelector('#invalid-input-message');
+            invalidInput.innerText = 'Field is required';
+            item.parentElement.querySelector('#invalid-input-message').style.visibility = "visible";
+        }
+    });
+}
+
+const hideFormErrors = function (errors){
+    errors.forEach(function (item) {
+
+        item.style.visibility = "hidden";
+
+    });
+}
 saveButton.addEventListener('click', function (event) {
+
+    // event.preventDefault();
     let form = userModal.find('form#user-form');
+
     let user = {
         'first_name': form.find('input#first-name').val(),
         'last_name': form.find('input#last-name').val(),
         'status': (form.find('input#status').prop('checked')),
         'role': form.find('select#role').val(),
     };
-    let emptyFields = false;
 
+    let emptyFields = false;
+    let fields = document.querySelector('form#user-form').querySelectorAll('input, select');
     for (const [key, value] of Object.entries(user)) {
         if ((!Boolean(value) || value === '0') && key !== 'status') {
             emptyFields = true;
@@ -129,8 +150,7 @@ saveButton.addEventListener('click', function (event) {
     }
 
     if (emptyFields) {
-        warningBody.text("Fill all data!");
-        warning.modal('show');
+        showFormErrors(fields);
         return;
     }
     switch (currentAction) {
@@ -153,7 +173,7 @@ saveButton.addEventListener('click', function (event) {
                         }
                         addUser(userData, table);
                         updateUser(tBody.lastElementChild, userData);
-                        if(selectAllCheckbox.checked){
+                        if (selectAllCheckbox.checked) {
                             selectAllCheckboxes(tBody);
                         }
                     }
@@ -189,7 +209,15 @@ saveButton.addEventListener('click', function (event) {
 warning.on('hidden.bs.modal', function () {
     warningBody.text("");
 });
+// userModal.on('show.bs.modal', function (){
+//     let form = userModal.find('form#user-form');
+//     form.find('input#first-name').val("");
+//     form.find('input#last-name').val("");
+//     form.find('input#status').prop('checked', true);
+//     form.find('select#role').val(0);
+// });
 userModal.on('shown.bs.modal', function (event) {
+    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#invalid-input-message'));
     let action = event.relatedTarget.id;
     let form = userModal.find('form#user-form');
     form.find('input#first-name').val("");
@@ -356,10 +384,10 @@ const allCheckboxesSelected = function (tBody) {
     let selectedCheckboxCount = tBody.querySelectorAll('input:checked').length;
     return checkboxCount !== selectedCheckboxCount;
 }
-const selectAllCheckboxes = function (tBody){
+const selectAllCheckboxes = function (tBody) {
     let checkboxes = tBody.querySelectorAll('input')
-    checkboxes.forEach(function (item){
-       item.setAttribute('checked', 'checked');
+    checkboxes.forEach(function (item) {
+        item.setAttribute('checked', 'checked');
     });
 
 }

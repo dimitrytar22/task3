@@ -29,10 +29,16 @@ $users = getAllUsers();
                         <div class="mb-3">
                             <label for="first-name" class="col-form-label">First Name:</label>
                             <input type="text" class="form-control" id="first-name">
+                            <div class="text-danger" id="invalid-input-message"  >
+
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="last-name" class="col-form-label">Last Name:</label>
                             <input type="text" class="form-control" id="last-name">
+                            <div class="text-danger" id="invalid-input-message" >
+
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="status" class="col-form-label">Status:</label>
@@ -47,12 +53,16 @@ $users = getAllUsers();
                                 <option>Admin</option>
                                 <option>User</option>
                             </select>
+                            <div class="text-danger" id="invalid-input-message" >
+
+                            </div>
                         </div>
+
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="save-button">Save</button>
+                    <button type="submit" class="btn btn-primary" id="save-button" >Save</button>
                 </div>
             </div>
         </div>
