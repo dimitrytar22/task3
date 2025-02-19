@@ -36,6 +36,15 @@ function getAllUsers()
     return $users;
 }
 
+function getAllRoles()
+{
+    return [
+        1 => 'Admin',
+        2 => 'User'
+    ];
+
+}
+
 function storeUser(array $arr)
 {
     global $connection;
@@ -43,7 +52,7 @@ function storeUser(array $arr)
     $preparedUser = $connection->prepare('Insert into users(first_name, last_name,status,role) values(:first_name, :last_name, :status, :role)');
     try {
         $preparedUser->execute($arr);
-    }catch (Exception $exception){
+    } catch (Exception $exception) {
         return false;
     }
     return $connection->lastInsertId();
@@ -64,7 +73,7 @@ function deleteUser($ids)
     $prepared = $connection->prepare("Delete from users where id $idsInPrepared");
     try {
         $prepared->execute($ids);
-    }catch (Exception $exception){
+    } catch (Exception $exception) {
         return false;
     }
 

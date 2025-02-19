@@ -1,6 +1,8 @@
 <?php
 require_once "functions.php";
 $users = getAllUsers();
+$roles = getAllRoles();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -50,8 +52,8 @@ $users = getAllUsers();
                             <label for="role" class="col-form-label">Role:</label>
                             <select class="w-50 form-select" aria-label="Default select example" id="role">
                                 <option selected value="0">Please select</option>
-                                <option>Admin</option>
-                                <option>User</option>
+                                <option >Admin</option>
+                                <option >User</option>
                             </select>
                             <div class="text-danger" id="invalid-input-message" >
 
@@ -159,7 +161,7 @@ $users = getAllUsers();
                         <circle cx="7" cy="7" r="7"/>
                     </svg>
                 </td>
-                <td id="role"><?= $user['role'] ?></td>
+                <td id="role"><?= $roles[$user['role']] ?></td>
                 <td><i class="fas fa-edit" data-bs-toggle="modal"
                        data-bs-target="#user-modal" data-action="edit" id="user-update" style="font-size:24px"></i>
 

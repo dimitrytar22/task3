@@ -15,7 +15,7 @@ if (empty($data)) {
 }
 
 $response = [];
-
+$roles = getAllRoles();
 $users = $data['users'] ?? [$data];
 
 $validatedUsers = [];
@@ -25,7 +25,7 @@ foreach ($users as $user) {
         'first_name' => htmlspecialchars(trim($user['first_name'])) ?? null,
         'last_name' => htmlspecialchars(trim($user['last_name'])) ?? null,
         'status' => (int)boolval(htmlspecialchars(trim($user['status']))) ?? null,
-        'role' => htmlspecialchars(ucfirst(trim($user['role']))) ?? null,
+        'role' => htmlspecialchars(trim($user['role'])) ?? null,
     ];
 
     $emptyFieldsExist = false;
@@ -38,11 +38,13 @@ foreach ($users as $user) {
         if (!$result) {
             $response = [
                 'status' => (bool)$result,
-                'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null];
+                'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null,
+                'user' => null];
             echo json_encode($response);
             exit;
         }
         $validatedUsers[] = $userFields;
+
         $response = [
             'status' => (bool)$result,
             'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null,

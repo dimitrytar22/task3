@@ -8,7 +8,10 @@ const saveButton = document.getElementById('save-button');
 const userModal = $('#user-modal');
 const warning = $('#warning-modal');
 const warningBody = $('#warning-modal #modal-body');
-
+const roles = {
+    1: "Admin",
+    2: "User"
+};
 
 let selectedIds = [];
 let selectedElements = [];
@@ -112,9 +115,9 @@ userStoreButton.addEventListener('click', function () {
     userModal.find('#user-modal-title').text("Create User");
 
 });
-const showFormErrors = function (fields){
+const showFormErrors = function (fields) {
     fields.forEach(function (item) {
-        if ((!item.value && item.id !== 'status') || ( item.tagName === "SELECT" && item.value === '0')) {
+        if ((!item.value && item.id !== 'status') || (item.tagName === "SELECT" && item.value === '0')) {
             let invalidInput = item.parentElement.querySelector('#invalid-input-message');
             invalidInput.innerText = 'Field is required';
             item.parentElement.querySelector('#invalid-input-message').style.visibility = "visible";
@@ -122,7 +125,7 @@ const showFormErrors = function (fields){
     });
 }
 
-const hideFormErrors = function (errors){
+const hideFormErrors = function (errors) {
     errors.forEach(function (item) {
 
         item.style.visibility = "hidden";
@@ -130,15 +133,15 @@ const hideFormErrors = function (errors){
     });
 }
 saveButton.addEventListener('click', function (event) {
-
-    // event.preventDefault();
     let form = userModal.find('form#user-form');
 
     let user = {
         'first_name': form.find('input#first-name').val(),
         'last_name': form.find('input#last-name').val(),
         'status': (form.find('input#status').prop('checked')),
-        'role': form.find('select#role').val(),
+        'role': Object.keys(roles).find((key) => {
+            return roles[key] === form.find('select#role').val()
+        }),
     };
 
     let emptyFields = false;
@@ -192,7 +195,7 @@ saveButton.addEventListener('click', function (event) {
                 success: function (data) {
                     console.log(data);
                     if (data.status) {
-                        let users = data.user;
+                        user.role = roles[user.role];
 
                         updateUser(elementToUpdate, user);
                         userModal.modal('hide');
@@ -209,13 +212,7 @@ saveButton.addEventListener('click', function (event) {
 warning.on('hidden.bs.modal', function () {
     warningBody.text("");
 });
-// userModal.on('show.bs.modal', function (){
-//     let form = userModal.find('form#user-form');
-//     form.find('input#first-name').val("");
-//     form.find('input#last-name').val("");
-//     form.find('input#status').prop('checked', true);
-//     form.find('select#role').val(0);
-// });
+
 userModal.on('shown.bs.modal', function (event) {
     hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#invalid-input-message'));
     let action = event.relatedTarget.id;
@@ -232,7 +229,6 @@ userModal.on('shown.bs.modal', function (event) {
     } else if (action === 'user-update') {
         let row = event.relatedTarget.closest('tr');
 
-        console.log(event)
         let data = [];
         let full_name = row.querySelector('#first-name').innerText.split(' ');
         let first_name = full_name[0];
@@ -276,25 +272,19 @@ groupActionsButtons.forEach(function (button) {
 
                     let id = item.dataset.id;
 
-                    let full_name = item.querySelector('td#first-name').innerText.split(' ');
-                    let first_name = full_name[0];
-                    let last_name = full_name[1];
 
                     let status = item.querySelector('td svg#status');
-                    let role = item.querySelector('td#role').innerText;
+
 
                     let user = {
                         id,
-                        first_name,
-                        last_name,
                         status: true,
-                        role
                     };
                     users.push(user);
 
                 });
                 $.ajax({
-                    url: '/update_user.php',
+                    url: '/update_user_status.php',
                     method: 'post',
                     dataType: 'json',
                     contentType: 'application/json; charset=utf-8',
@@ -302,9 +292,7 @@ groupActionsButtons.forEach(function (button) {
                     success: function (data) {
                         console.log(data)
                         if (data.status) {
-                            console.log(selectedElements)
                             selectedElements.forEach(function (user) {
-                                console.log(user)
                                 user.querySelector('#status').setAttribute('fill', 'green');
 
                             });
@@ -325,26 +313,19 @@ groupActionsButtons.forEach(function (button) {
 
                     let id = item.dataset.id;
 
-                    let full_name = item.querySelector('td#first-name').innerText.split(' ');
-                    let first_name = full_name[0];
-                    let last_name = full_name[1];
+
 
                     let status = item.querySelector('td svg#status');
-                    let role = item.querySelector('td#role').innerText;
-
 
                     let user = {
                         id,
-                        first_name,
-                        last_name,
                         status: false,
-                        role
                     };
                     users.push(user);
 
                 });
                 $.ajax({
-                    url: '/update_user.php',
+                    url: '/update_user_status.php',
                     method: 'post',
                     dataType: 'json',
                     contentType: 'application/json; charset=utf-8',
@@ -353,7 +334,6 @@ groupActionsButtons.forEach(function (button) {
                         console.log(data)
                         if (data.status) {
                             selectedElements.forEach(function (user) {
-                                console.log(user)
                                 user.querySelector('#status').setAttribute('fill', 'gray');
 
                             });
@@ -394,7 +374,6 @@ const selectAllCheckboxes = function (tBody) {
 
 const updateUser = function (element, user) {
 
-
     element.querySelector('#first-name').innerText = user.first_name + " " + user.last_name;
     element.querySelector('#status').setAttribute('fill', user.status === true ? 'green' : 'gray');
     element.querySelector('#role').innerText = user.role;
@@ -427,6 +406,5 @@ const addUser = function (data, table) {
     `;
 
     tBody.appendChild(elem);
-    console.log(tBody)
 };
 

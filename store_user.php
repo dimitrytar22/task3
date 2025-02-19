@@ -18,10 +18,9 @@ $user = $data['user'];
 $userFields = [
     'first_name' => htmlspecialchars(trim($user['first_name'])) ?? null,
     'last_name' => htmlspecialchars(trim($user['last_name'])) ?? null,
-    'status' => ((int)boolval(htmlspecialchars(trim($user['status'])))) ?? null,
-    'role' => htmlspecialchars(ucfirst(trim($user['role']))) ?? null,
+    'status' => ((int)boolval($user['status'])) ?? null,
+    'role' => htmlspecialchars(trim($user['role'])) ?? null,
 ];
-
 
 $emptyFieldsExist = false;
 foreach ($userFields as $key => $value) {
