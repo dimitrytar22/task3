@@ -19,8 +19,8 @@ $users = $data['users'] ?? [$data];
 
 foreach ($users as $user) {
     $userFields = [
-        'id' => htmlspecialchars(intval($user['id'])) ?? null,
-        'status' => (int)boolval(htmlspecialchars(trim($user['status']))) ?? null,
+        'id' => intval(htmlspecialchars($user['id'])) ?? null,
+        'status' => (int)boolval(htmlspecialchars($user['status'])) ?? null,
     ];
 
 

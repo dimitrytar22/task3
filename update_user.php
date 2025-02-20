@@ -16,47 +16,42 @@ if (empty($data)) {
 
 $response = [];
 $roles = getAllRoles();
-$users = $data['users'] ?? [$data];
 
-$validatedUsers = [];
-foreach ($users as $user) {
-    $userFields = [
-        'id' => htmlspecialchars(intval($user['id'])) ?? null,
-        'first_name' => htmlspecialchars(trim($user['first_name'])) ?? null,
-        'last_name' => htmlspecialchars(trim($user['last_name'])) ?? null,
-        'status' => (int)boolval(htmlspecialchars(trim($user['status']))) ?? null,
-        'role' => htmlspecialchars(trim($user['role'])) ?? null,
-    ];
+$dataFields = [
+    'id' => intval(htmlspecialchars($data['id'])) ?? null,
+    'first_name' => htmlspecialchars(trim($data['first_name'])) ?? null,
+    'last_name' => htmlspecialchars(trim($data['last_name'])) ?? null,
+    'status' => (int)boolval(htmlspecialchars($data['status'])) ?? null,
+    'role' => htmlspecialchars($data['role']) ?? null,
+];
 
-    $emptyFieldsExist = false;
-    foreach ($userFields as $key => $value) {
-        if (empty(($value)) && $key != 'status')
-            $emptyFieldsExist = true;
-    }
-    if (!$emptyFieldsExist) {
-        $result = updateUser($userFields);
-        if (!$result) {
-            $response = [
-                'status' => (bool)$result,
-                'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null,
-                'user' => null];
-            echo json_encode($response);
-            exit;
-        }
-        $validatedUsers[] = $userFields;
-
+$emptyFieldsExist = false;
+foreach ($dataFields as $key => $value) {
+    if (empty(($value)) && $key != 'status')
+        $emptyFieldsExist = true;
+}
+if (!$emptyFieldsExist) {
+    $result = updateUser($dataFields);
+    if (!$result) {
         $response = [
             'status' => (bool)$result,
             'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null,
-            'user' => $result ? $users : null
-        ];
-    } else {
-        $response = [
-            'status' => false,
-            'error' => ['code' => 100, 'message' => 'bad request']
-        ];
-        break;
+            'user' => null];
+        echo json_encode($response);
+        exit;
     }
+
+
+    $response = [
+        'status' => (bool)$result,
+        'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null,
+        'user' => $result ? $dataFields : null
+    ];
+} else {
+    $response = [
+        'status' => false,
+        'error' => ['code' => 100, 'message' => 'bad request']
+    ];
 
 }
 
