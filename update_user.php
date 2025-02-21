@@ -22,7 +22,7 @@ $dataFields = [
     'first_name' => htmlspecialchars(trim($data['first_name'])) ?? null,
     'last_name' => htmlspecialchars(trim($data['last_name'])) ?? null,
     'status' => (int)boolval(htmlspecialchars($data['status'])) ?? null,
-    'role' => htmlspecialchars($data['role']) ?? null,
+    'role' => intval(htmlspecialchars($data['role'])) ?? null,
 ];
 
 $emptyFieldsExist = false;

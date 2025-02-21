@@ -42,6 +42,8 @@ tBody.addEventListener('change', function (event) {
 
 tBody.addEventListener('click', function (event) {
     let action = event.target.dataset.action;
+    if(!action)
+        return;
     let tr = event.target.closest('tr');
     let user = {
         id: tr.dataset.id,
@@ -139,9 +141,9 @@ saveButton.addEventListener('click', function (event) {
         'first_name': form.find('input#first-name').val(),
         'last_name': form.find('input#last-name').val(),
         'status': (form.find('input#status').prop('checked')),
-        'role': Object.keys(roles).find((key) => {
+        'role': Number(Object.keys(roles).find((key) => {
             return roles[key] === form.find('select#role').val()
-        }),
+        })),
     };
 
     let emptyFields = false;

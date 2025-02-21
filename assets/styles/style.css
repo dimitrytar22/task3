@@ -1,3 +1,6 @@
 i[data-action]{
     cursor: pointer;
 }
+.fa-edit, .fa-trash{
+    font-size:24px;
+}
