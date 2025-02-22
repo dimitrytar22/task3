@@ -31,14 +31,14 @@ $roles = getAllRoles();
                         <div class="mb-3">
                             <label for="first-name" class="col-form-label">First Name:</label>
                             <input type="text" class="form-control" id="first-name">
-                            <div class="text-danger" id="invalid-input-message"  >
+                            <div class="text-danger" id="invalid-input-message"  inert>
 
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="last-name" class="col-form-label">Last Name:</label>
                             <input type="text" class="form-control" id="last-name">
-                            <div class="text-danger" id="invalid-input-message" >
+                            <div class="text-danger" id="invalid-input-message" inert>
 
                             </div>
                         </div>
@@ -55,7 +55,7 @@ $roles = getAllRoles();
                                 <option >Admin</option>
                                 <option >User</option>
                             </select>
-                            <div class="text-danger" id="invalid-input-message" >
+                            <div class="text-danger" id="invalid-input-message" inert >
 
                             </div>
                         </div>

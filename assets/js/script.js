@@ -42,7 +42,7 @@ tBody.addEventListener('change', function (event) {
 
 tBody.addEventListener('click', function (event) {
     let action = event.target.dataset.action;
-    if(!action)
+    if (!action)
         return;
     let tr = event.target.closest('tr');
     let user = {
@@ -137,15 +137,26 @@ const hideFormErrors = function (errors) {
 saveButton.addEventListener('click', function (event) {
     let form = userModal.find('form#user-form');
 
+    let firstNameInput = form.find('input#first-name');
+    let lastNameInput = form.find('input#last-name');
+    let statusInput = form.find('input#status');
+    let roleSelect = form.find('select#role');
+
+    if (!firstNameInput.length || !lastNameInput.length || !statusInput.length || !roleSelect.length) {
+        userModal.modal("hide");
+        warningBody.text("Invalid form");
+        warning.modal("show");
+        return;
+    }
+
     let user = {
-        'first_name': form.find('input#first-name').val(),
-        'last_name': form.find('input#last-name').val(),
-        'status': (form.find('input#status').prop('checked')),
+        'first_name': firstNameInput.val(),
+        'last_name': lastNameInput.val(),
+        'status': statusInput.prop('checked'),
         'role': Number(Object.keys(roles).find((key) => {
-            return roles[key] === form.find('select#role').val()
+            return roles[key] === roleSelect.val();
         })),
     };
-
     let emptyFields = false;
     let fields = document.querySelector('form#user-form').querySelectorAll('input, select');
     for (const [key, value] of Object.entries(user)) {
@@ -156,6 +167,7 @@ saveButton.addEventListener('click', function (event) {
 
     if (emptyFields) {
         showFormErrors(fields);
+
         return;
     }
     switch (currentAction) {
@@ -176,12 +188,17 @@ saveButton.addEventListener('click', function (event) {
                             status: form.find('input#status').prop('checked'),
                             role: form.find('select#role').val()
                         }
+
                         addUser(userData, table);
                         updateUser(tBody.lastElementChild, userData);
                         if (selectAllCheckbox.checked) {
                             selectAllCheckboxes(tBody);
                         }
+                    } else {
+                        warningBody.text("User not updated!");
+                        warning.modal("show");
                     }
+
                     userModal.modal('hide');
                 }
             });
@@ -214,7 +231,12 @@ saveButton.addEventListener('click', function (event) {
 warning.on('hidden.bs.modal', function () {
     warningBody.text("");
 });
-
+userModal.on('show.bs.modal', function (event) {
+    userModal.removeAttr("inert");
+});
+userModal.on('hide.bs.modal', function (event) {
+    userModal.attr("inert", "");
+});
 userModal.on('shown.bs.modal', function (event) {
     hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#invalid-input-message'));
     let action = event.relatedTarget.id;
@@ -262,7 +284,7 @@ groupActionsButtons.forEach(function (button) {
             warning.modal('show');
             return;
         }
-        // selectedElements = [];
+        selectedElements = [];
         tBody.querySelectorAll('input:checked').forEach(function (item) {
             selectedElements.push(item.closest('tr'));
         });
@@ -298,6 +320,9 @@ groupActionsButtons.forEach(function (button) {
                                 user.querySelector('#status').setAttribute('fill', 'green');
 
                             });
+                        } else {
+                            warningBody.text("User not updated!");
+                            warning.modal("show");
                         }
 
                         userModal.modal('hide');
@@ -314,7 +339,6 @@ groupActionsButtons.forEach(function (button) {
                 selectedElements.forEach((item) => {
 
                     let id = item.dataset.id;
-
 
 
                     let status = item.querySelector('td svg#status');
@@ -340,6 +364,9 @@ groupActionsButtons.forEach(function (button) {
 
                             });
 
+                        } else {
+                            warningBody.text("User not updated!");
+                            warning.modal("show");
                         }
 
 
@@ -377,7 +404,7 @@ const selectAllCheckboxes = function (tBody) {
 const updateUser = function (element, user) {
 
     element.querySelector('#first-name').innerText = user.first_name + " " + user.last_name;
-    element.querySelector('#status').setAttribute('fill', user.status === true ? 'green' : 'gray');
+    element.querySelector('#status').setAttribute('fill', Boolean(user.status) === true ? 'green' : 'gray');
     element.querySelector('#role').innerText = user.role;
 
 
