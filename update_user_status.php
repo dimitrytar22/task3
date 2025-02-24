@@ -1,45 +1,41 @@
 <?php
 require_once 'functions.php';
+
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (empty($data)) {
-    $response = [
+    echo json_encode([
         'status' => false,
-        'error' => ['code' => 100, 'message' => 'bad request'],
-        'user' => null
-
-    ];
-
-    echo json_encode($response);
+        'error' => ['code' => 100, 'message' => 'Bad request']
+    ]);
     exit;
 }
 
-$response = [];
 $users = $data['users'] ?? [$data];
+$userIds = array_column($users, 'id');
+
+if (!allUsersExist($userIds)) {
+    echo json_encode([
+        'status' => false,
+        'error' => ['code' => 100, 'message' => count($users) > 1 ? 'Users not updated' : 'User not updated']
+    ]);
+    exit;
+}
+
+$updated = false;
 
 foreach ($users as $user) {
     $userFields = [
-        'id' => intval(htmlspecialchars($user['id'])) ?? null,
-        'status' => (int)boolval(htmlspecialchars($user['status'])) ?? null,
+        'id' => intval($user['id']),
+        'status' => (int)boolval($user['status']),
     ];
 
-
-    $result = updateUser($userFields);
-    if (!$result) {
-        $response = [
-            'status' => (bool)$result,
-            'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null,];
-        echo json_encode($response);
-        exit;
-    } else {
-        $response = [
-            'status' => (bool)$result,
-            'error' => !$result ? ['code' => 100, 'message' => 'not user found'] : null,
-        ];
+    if (updateUser($userFields)) {
+        $updated = true;
     }
-
-
 }
 
-
-echo json_encode($response);
+echo json_encode([
+    'status' => $updated,
+    'error' => $updated ? null : ['code' => 100, 'message' => count($users) > 1 ? 'Users not updated' : 'User not updated']
+]);

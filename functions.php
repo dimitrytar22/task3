@@ -80,3 +80,13 @@ function deleteUser($ids)
     return $prepared->rowCount();
 }
 
+function allUsersExist(array $ids){
+    global $connection;
+    $sql = "select count(id) from users where id in(". implode(',',$ids). ");";
+
+
+
+    $prepared = $connection->prepare($sql);
+    $prepared->execute($ids);
+    return count($ids) == $prepared->fetchColumn();
+}

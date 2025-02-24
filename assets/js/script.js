@@ -80,7 +80,7 @@ deleteConfirm.addEventListener('click', function (event) {
                     selectedElements.forEach((elem) => {
                         elem.remove();
                     });
-                }else{
+                } else {
                     $("#delete-confirm-modal").modal('hide');
                     warningBody.text("User not deleted!");
                     warning.modal("show");
@@ -126,32 +126,30 @@ userStoreButton.addEventListener('click', function () {
 const showFormErrors = function (fields) {
     fields.forEach(function (item) {
         if ((!item.value && item.id !== 'status') || (item.tagName === "SELECT" && item.value === '0')) {
-            let invalidInput = item.parentElement.querySelector('#invalid-input-message');
+            let invalidInput = item.parentElement.querySelector('#error-message');
             invalidInput.innerText = 'Field is required';
-            item.parentElement.querySelector('#invalid-input-message').style.visibility = "visible";
+            item.parentElement.querySelector('#error-message').style.display = 'block';
         }
     });
 }
 
 const hideFormErrors = function (errors) {
     errors.forEach(function (item) {
-
-        item.style.visibility = "hidden";
-
+        item.style.display = 'none';
     });
 }
 saveButton.addEventListener('click', function (event) {
+    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#error-message'));
     let form = userModal.find('form#user-form');
-
+    let formGeneralError =   $("#error-message.general");
     let firstNameInput = form.find('input#first-name');
     let lastNameInput = form.find('input#last-name');
     let statusInput = form.find('input#status');
     let roleSelect = form.find('select#role');
 
     if (!firstNameInput.length || !lastNameInput.length || !statusInput.length || !roleSelect.length) {
-        userModal.modal("hide");
-        warningBody.text("Invalid form");
-        warning.modal("show");
+        formGeneralError.css("display", 'block');
+        formGeneralError.text("Invalid form");
         return;
     }
 
@@ -170,6 +168,7 @@ saveButton.addEventListener('click', function (event) {
             emptyFields = true;
         }
     }
+
 
     if (emptyFields) {
         showFormErrors(fields);
@@ -201,9 +200,9 @@ saveButton.addEventListener('click', function (event) {
                             selectAllCheckboxes(tBody);
                         }
                     } else {
-                        userModal.modal('hide');
-                        warningBody.text("User not created!");
-                        warning.modal("show");
+                        formGeneralError.css("display", 'block');
+                        formGeneralError.text(data.error.message);
+
                     }
 
                     userModal.modal('hide');
@@ -226,10 +225,11 @@ saveButton.addEventListener('click', function (event) {
                         updateUser(elementToUpdate, user);
                         userModal.modal('hide');
                         selectedElements = [];
-                    }else{
-                        userModal.modal('hide');
-                        warningBody.text("User not updated!");
-                        warning.modal("show");
+
+                    } else {
+                        formGeneralError.css("display", 'block');
+                        formGeneralError.text(data.error.message);
+
                     }
                 }
             });
@@ -254,7 +254,7 @@ Array.from(modals).forEach((modal) => {
 
 
 userModal.on('shown.bs.modal', function (event) {
-    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#invalid-input-message'));
+    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#error-message'));
     let action = event.relatedTarget.id;
     let form = userModal.find('form#user-form');
     form.find('input#first-name').val("");
@@ -301,6 +301,7 @@ groupActionsButtons.forEach(function (button) {
             return;
         }
         selectedElements = [];
+
         tBody.querySelectorAll('input:checked').forEach(function (item) {
             selectedElements.push(item.closest('tr'));
         });
@@ -337,7 +338,7 @@ groupActionsButtons.forEach(function (button) {
 
                             });
                         } else {
-                            warningBody.text("User not updated!");
+                            warningBody.text(data.error.message);
                             warning.modal("show");
                         }
 
@@ -381,7 +382,7 @@ groupActionsButtons.forEach(function (button) {
                             });
 
                         } else {
-                            warningBody.text("User not updated!");
+                            warningBody.text(data.error.message);
                             warning.modal("show");
                         }
 
@@ -405,8 +406,8 @@ groupActionsButtons.forEach(function (button) {
 
 });
 const allCheckboxesSelected = function (tBody) {
-    let checkboxCount = tBody.querySelectorAll('input').length;
-    let selectedCheckboxCount = tBody.querySelectorAll('input:checked').length;
+    let checkboxCount = tBody.querySelectorAll('input[type=checkbox]').length;
+    let selectedCheckboxCount = tBody.querySelectorAll('input[type=checkbox]:checked').length;
     return checkboxCount !== selectedCheckboxCount;
 }
 const selectAllCheckboxes = function (tBody) {

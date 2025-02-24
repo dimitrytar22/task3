@@ -28,17 +28,20 @@ $roles = getAllRoles();
                 </div>
                 <div class="modal-body">
                     <form id="user-form">
+                        <div class="text-danger error-message general" id="error-message">
+123
+                        </div>
                         <div class="mb-3">
                             <label for="first-name" class="col-form-label">First Name:</label>
                             <input type="text" class="form-control" id="first-name">
-                            <div class="text-danger" id="invalid-input-message"  inert>
+                            <div class="text-danger" id="error-message" inert>
 
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="last-name" class="col-form-label">Last Name:</label>
                             <input type="text" class="form-control" id="last-name">
-                            <div class="text-danger" id="invalid-input-message" inert>
+                            <div class="text-danger" id="error-message" inert>
 
                             </div>
                         </div>
@@ -52,10 +55,10 @@ $roles = getAllRoles();
                             <label for="role" class="col-form-label">Role:</label>
                             <select class="w-50 form-select" aria-label="Default select example" id="role">
                                 <option selected value="0">Please select</option>
-                                <option >Admin</option>
-                                <option >User</option>
+                                <option>Admin</option>
+                                <option>User</option>
                             </select>
-                            <div class="text-danger" id="invalid-input-message" inert >
+                            <div class="text-danger" id="error-message" inert>
 
                             </div>
                         </div>
@@ -64,7 +67,7 @@ $roles = getAllRoles();
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="save-button" >Save</button>
+                    <button type="submit" class="btn btn-primary" id="save-button">Save</button>
                 </div>
             </div>
         </div>
@@ -87,7 +90,6 @@ $roles = getAllRoles();
             </div>
         </div>
     </div>
-
 
 
     <div class="modal fade" id="delete-confirm-modal" tabindex="-1" aria-labelledby="delete-confirm-modal"
@@ -152,7 +154,7 @@ $roles = getAllRoles();
                     <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
 
                 </th>
-                <td id="first-name"><?= "$user[first_name]  $user[last_name]"?></td>
+                <td id="first-name"><?= "$user[first_name]  $user[last_name]" ?></td>
                 <td>
                     <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16"
                          fill="<?= $user['status'] == 1 ? 'green' : 'gray' ?>"
@@ -165,7 +167,7 @@ $roles = getAllRoles();
                 <td><i class="fas fa-edit" data-bs-toggle="modal"
                        data-bs-target="#user-modal" data-action="edit" id="user-update"></i>
 
-                    <i class="fa-solid fa-trash"data-bs-toggle="modal"
+                    <i class="fa-solid fa-trash" data-bs-toggle="modal"
                        data-bs-target="#delete-confirm-modal" data-action="delete" id="user-delete"></i>
 
                 </td>

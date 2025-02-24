@@ -5,7 +5,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 if (empty($data)) {
     $response = [
         'status' => false,
-        'error' => ['code' => 100, 'message' => 'bad request'],
+        'error' => ['code' => 100, 'message' => 'Bad request'],
     ];
     echo json_encode($response);
     exit;
@@ -18,7 +18,7 @@ if (!empty($ids))
 
 $response = [
     'status' => (bool)$result,
-    'error' => !((bool)$result) ? ['code' => 100, 'message' => 'user not found'] : null,
+    'error' => !((bool)$result) ? ['code' => 100, 'message' => count($data) > 1 ? 'Users not deleted' : 'User not deleted'] : null,
 ];
 
 
