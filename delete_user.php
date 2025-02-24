@@ -12,13 +12,19 @@ if (empty($data)) {
 }
 
 $ids = validateIds($data['user_ids']);
-
+if (!allUsersExist($ids)) {
+    echo json_encode([
+        'status' => false,
+        'error' => ['code' => 100, 'message' => count($ids) > 1 ? 'Users not deleted' : 'User not deleted']
+    ]);
+    exit;
+}
 if (!empty($ids))
     $result = deleteUser($ids);
 
 $response = [
     'status' => (bool)$result,
-    'error' => !((bool)$result) ? ['code' => 100, 'message' => count($data) > 1 ? 'Users not deleted' : 'User not deleted'] : null,
+    'error' => !((bool)$result) ? ['code' => 100, 'message' => count($ids) > 1 ? 'Users not deleted' : 'User not deleted'] : null,
 ];
 
 

@@ -82,10 +82,14 @@ function deleteUser($ids)
 
 function allUsersExist(array $ids){
     global $connection;
-    $sql = "select count(id) from users where id in(". implode(',',$ids). ");";
+    $sql = "select count(id) from users where id in(";
 
 
-
+    foreach($ids as $id){
+        $sql .= "?,";
+    }
+    $sql = rtrim($sql, ',');
+    $sql .= ');';
     $prepared = $connection->prepare($sql);
     $prepared->execute($ids);
     return count($ids) == $prepared->fetchColumn();

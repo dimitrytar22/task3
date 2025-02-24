@@ -33,7 +33,7 @@ selectAllCheckbox.addEventListener('change', function (event) {
 });
 
 tBody.addEventListener('change', function (event) {
-    let emptyCheckboxes = allCheckboxesSelected(tBody);
+    let emptyCheckboxes = !allCheckboxesSelected(tBody);
     if (emptyCheckboxes)
         selectAllCheckbox.checked = false;
     else
@@ -80,14 +80,13 @@ deleteConfirm.addEventListener('click', function (event) {
                     selectedElements.forEach((elem) => {
                         elem.remove();
                     });
+                    updateCheckboxes(tBody);
                 } else {
                     $("#delete-confirm-modal").modal('hide');
-                    warningBody.text("User not deleted!");
+                    warningBody.text(data.error.message);
                     warning.modal("show");
                 }
-                if (tBody.querySelectorAll('tr').length === 0) {
-                    selectAllCheckbox.checked = false;
-                }
+
                 modal.modal('hide');
             }
         });
@@ -102,6 +101,7 @@ deleteConfirm.addEventListener('hidden.bs.modal', function () {
 
 
 });
+
 deleteConfirm.addEventListener('shown.bs.modal', function () {
     deleteConfirm.querySelector('#modal-body').innerHTML = "You want to delete users:<br>";
     selectedElements.forEach((item) => {
@@ -110,8 +110,6 @@ deleteConfirm.addEventListener('shown.bs.modal', function () {
         let first_name = full_name[0];
         let last_name = full_name[1];
         deleteConfirm.querySelector('#modal-body').innerHTML += `<b>ID:</b> ${id} <b>${first_name} ${last_name}</b><br>`;
-        selectedIds.push(id);
-        selectedElements.push(item);
     });
 });
 userModal.on('hidden.bs.modal', function () {
@@ -405,10 +403,16 @@ groupActionsButtons.forEach(function (button) {
     });
 
 });
+const updateCheckboxes = function (tBody){
+    if(allCheckboxesSelected(tBody))
+        selectAllCheckbox.checked = true;
+    else
+        selectAllCheckbox.checked = false;
+}
 const allCheckboxesSelected = function (tBody) {
     let checkboxCount = tBody.querySelectorAll('input[type=checkbox]').length;
     let selectedCheckboxCount = tBody.querySelectorAll('input[type=checkbox]:checked').length;
-    return checkboxCount !== selectedCheckboxCount;
+    return checkboxCount === selectedCheckboxCount;
 }
 const selectAllCheckboxes = function (tBody) {
     let checkboxes = tBody.querySelectorAll('input')

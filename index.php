@@ -29,7 +29,6 @@ $roles = getAllRoles();
                 <div class="modal-body">
                     <form id="user-form">
                         <div class="text-danger error-message general" id="error-message">
-123
                         </div>
                         <div class="mb-3">
                             <label for="first-name" class="col-form-label">First Name:</label>
