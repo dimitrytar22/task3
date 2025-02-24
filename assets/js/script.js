@@ -1,4 +1,5 @@
 const table = document.getElementById('users');
+console.log();
 const tBody = table.getElementsByTagName('tbody')[0];
 const selectAllCheckbox = document.getElementById('select-all');
 const deleteConfirm = document.getElementById('delete-confirm-modal');
@@ -8,6 +9,7 @@ const saveButton = document.getElementById('save-button');
 const userModal = $('#user-modal');
 const warning = $('#warning-modal');
 const warningBody = $('#warning-modal #modal-body');
+const modals = document.querySelectorAll('.modal, .fade');
 const roles = {
     1: "Admin",
     2: "User"
@@ -78,6 +80,10 @@ deleteConfirm.addEventListener('click', function (event) {
                     selectedElements.forEach((elem) => {
                         elem.remove();
                     });
+                }else{
+                    $("#delete-confirm-modal").modal('hide');
+                    warningBody.text("User not deleted!");
+                    warning.modal("show");
                 }
                 if (tBody.querySelectorAll('tr').length === 0) {
                     selectAllCheckbox.checked = false;
@@ -195,7 +201,8 @@ saveButton.addEventListener('click', function (event) {
                             selectAllCheckboxes(tBody);
                         }
                     } else {
-                        warningBody.text("User not updated!");
+                        userModal.modal('hide');
+                        warningBody.text("User not created!");
                         warning.modal("show");
                     }
 
@@ -219,6 +226,10 @@ saveButton.addEventListener('click', function (event) {
                         updateUser(elementToUpdate, user);
                         userModal.modal('hide');
                         selectedElements = [];
+                    }else{
+                        userModal.modal('hide');
+                        warningBody.text("User not updated!");
+                        warning.modal("show");
                     }
                 }
             });
@@ -231,12 +242,17 @@ saveButton.addEventListener('click', function (event) {
 warning.on('hidden.bs.modal', function () {
     warningBody.text("");
 });
-userModal.on('show.bs.modal', function (event) {
-    userModal.removeAttr("inert");
+
+Array.from(modals).forEach((modal) => {
+    modal.addEventListener('show.bs.modal', function () {
+        modal.removeAttribute("inert");
+    });
+    modal.addEventListener('hide.bs.modal', function () {
+        modal.setAttribute("inert", "");
+    });
 });
-userModal.on('hide.bs.modal', function (event) {
-    userModal.attr("inert", "");
-});
+
+
 userModal.on('shown.bs.modal', function (event) {
     hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#invalid-input-message'));
     let action = event.relatedTarget.id;
