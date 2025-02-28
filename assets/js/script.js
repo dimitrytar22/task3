@@ -1,19 +1,19 @@
 const table = document.getElementById('users');
-console.log();
 const tBody = table.getElementsByTagName('tbody')[0];
 const selectAllCheckbox = document.getElementById('select-all');
-const deleteConfirm = document.getElementById('delete-confirm-modal');
-const userStoreButton = document.getElementById('user-store');
-const groupActionsButtons = document.querySelectorAll('#group-actions-button');
+const userStoreButton = document.querySelectorAll('.user-store');
+const groupActionsButtons = document.querySelectorAll('.group-actions-button');
 const saveButton = document.getElementById('save-button');
-const userModal = $('#user-modal');
-const warning = $('#warning-modal');
-const warningBody = $('#warning-modal #modal-body');
+const userForm = document.querySelector('#user-modal');
+const userModal = new bootstrap.Modal(userForm, {});
+const deleteConfirm = document.getElementById('delete-confirm-modal');
+const deleteConfirmModal = new bootstrap.Modal(deleteConfirm);
+const warning = document.querySelector('#warning-modal');
+const warningModal = new bootstrap.Modal(warning, {});
+const warningBody = document.querySelector('#warning-modal #modal-body');
+
 const modals = document.querySelectorAll('.modal, .fade');
-const roles = {
-    1: "Admin",
-    2: "User"
-};
+
 
 let selectedIds = [];
 let selectedElements = [];
@@ -43,90 +43,112 @@ tBody.addEventListener('change', function (event) {
 
 
 tBody.addEventListener('click', function (event) {
-    let action = event.target.dataset.action;
+    let action = event.target.id;
+
     if (!action)
         return;
     let tr = event.target.closest('tr');
     let user = {
         id: tr.dataset.id,
-        first_name: tr.querySelector('#first-name').innerText
+        first_name: tr.dataset.firstName,
+        last_name: tr.dataset.lastName
     }
 
-    if (action === 'edit') {
-        selectedElements.push(event.target.closest('tr'));
-        userModal.find('#user-modal-title').html(`Update User <b>ID: </b>${user.id} <b>Name: </b>${user.first_name}`);
+    if(!tr.dataset.firstName || !tr.dataset.lastName || !tr.dataset.id){
+        warningBody.innerText = "Invalid user table";
+        warningModal.show();
+        return;
+    }
+    if (action === 'user-update') {
+        currentAction = 'update';
+        elementToUpdate = tr;
+
+        userForm.querySelector('#user-modal-title').innerHTML = (`Update User <b>ID: </b>${user.id} <b>Name: </b>${user.first_name}`);
+        userModal.show();
 
 
-    } else if (action === 'delete') {
+    } else if (action === 'user-delete') {
+
+
         let elem = event.target.closest('tr');
         let id = elem.dataset.id;
         selectedIds.push(id);
         selectedElements.push(elem);
+        deleteConfirmModal.show();
     }
 });
-deleteConfirm.addEventListener('click', function (event) {
-    let modal = $(this);
+deleteConfirm.addEventListener('click', async function (event) {
 
     if (event.target.dataset.action === 'confirm' && selectedIds.length > 0) {
-        $.ajax({
-            url: '/delete_user.php',
-            method: 'post',
-            dataType: 'json',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify({user_ids: selectedIds}),
-            success: function (data) {
-                console.log(data);
-                if (data.status) {
-                    selectedElements.forEach((elem) => {
-                        elem.remove();
-                    });
-                    updateCheckboxes(tBody);
-                } else {
-                    $("#delete-confirm-modal").modal('hide');
-                    warningBody.text(data.error.message);
-                    warning.modal("show");
-                }
-
-                modal.modal('hide');
-            }
+        const response = await fetch('/delete_user.php', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json; charset=utf-8",
+                "DataType": "json",
+            },
+            body: JSON.stringify({user_ids: selectedIds}),
         });
+        if (response.ok) {
+            let json = await response.json();
 
-    } else if (event.target.dataset.action === 'cancel')
-        modal.modal('hide');
+            console.log(json);
+            if (json.status) {
+                selectedElements.forEach((elem) => {
+                    elem.remove();
+                });
+                updateCheckboxes(tBody);
+            } else {
+                deleteConfirmModal.hide();
+                warningBody.innerText = json.error.message;
+                warningModal.show();
+            }
+
+            deleteConfirmModal.hide();
+        }else {
+            deleteConfirmModal.hide();
+            warningBody.innerText = "Error " + response.status;
+            warningModal.show();
+        }
+
+    }
+    if (event.target.dataset.action === 'cancel')
+        deleteConfirmModal.hide();
 
 });
-deleteConfirm.addEventListener('hidden.bs.modal', function () {
+deleteConfirm.addEventListener('hide.bs.modal', function () {
     selectedIds = [];
     selectedElements = [];
-
-
 });
 
-deleteConfirm.addEventListener('shown.bs.modal', function () {
+deleteConfirm.addEventListener('show.bs.modal', function () {
     deleteConfirm.querySelector('#modal-body').innerHTML = "You want to delete users:<br>";
     selectedElements.forEach((item) => {
-        let full_name = item.querySelector('#first-name').innerText.split(' ');
         let id = item.dataset.id;
-        let first_name = full_name[0];
-        let last_name = full_name[1];
+        let first_name = item.dataset.firstName;
+        let last_name = item.dataset.lastName;
         deleteConfirm.querySelector('#modal-body').innerHTML += `<b>ID:</b> ${id} <b>${first_name} ${last_name}</b><br>`;
     });
 });
-userModal.on('hidden.bs.modal', function () {
+userForm.addEventListener('hide.bs.modal', function () {
     currentAction = null;
     elementToUpdate = null;
     selectedElements = [];
 });
-userStoreButton.addEventListener('click', function () {
-    userModal.find('#user-modal-title').text("Create User");
+userStoreButton.forEach((item) => {
+    item.addEventListener('click', function () {
+        currentAction = 'store';
+        userModal.show();
+        userForm.querySelector('#user-modal-title').innerText = "Create User";
+
+    });
 
 });
 const showFormErrors = function (fields) {
     fields.forEach(function (item) {
         if ((!item.value && item.id !== 'status') || (item.tagName === "SELECT" && item.value === '0')) {
-            let invalidInput = item.parentElement.querySelector('#error-message');
+            let invalidInput = item.parentElement.querySelector('.error-message');
             invalidInput.innerText = 'Field is required';
-            item.parentElement.querySelector('#error-message').style.display = 'block';
+            item.parentElement.querySelector('.error-message').style.display = 'block';
         }
     });
 }
@@ -136,28 +158,26 @@ const hideFormErrors = function (errors) {
         item.style.display = 'none';
     });
 }
-saveButton.addEventListener('click', function (event) {
-    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#error-message'));
-    let form = userModal.find('form#user-form');
-    let formGeneralError =   $("#error-message.general");
-    let firstNameInput = form.find('input#first-name');
-    let lastNameInput = form.find('input#last-name');
-    let statusInput = form.find('input#status');
-    let roleSelect = form.find('select#role');
+saveButton.addEventListener('click', async function (event) {
+    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('.error-message'));
+    let form = userForm.querySelector('form#user-form');
+    let formGeneralError = document.querySelector(".error-message.general");
+    let firstNameInput = form.querySelector('input#first-name');
+    let lastNameInput = form.querySelector('input#last-name');
+    let statusInput = form.querySelector('input#status');
+    let roleSelect = form.querySelector('select#role');
 
-    if (!firstNameInput.length || !lastNameInput.length || !statusInput.length || !roleSelect.length) {
-        formGeneralError.css("display", 'block');
-        formGeneralError.text("Invalid form");
+    if (!firstNameInput || !lastNameInput || !statusInput || !roleSelect) {
+        formGeneralError.style.display = 'block';
+        formGeneralError.innerText = "Invalid form";
         return;
     }
 
     let user = {
-        'first_name': firstNameInput.val(),
-        'last_name': lastNameInput.val(),
-        'status': statusInput.prop('checked'),
-        'role': Number(Object.keys(roles).find((key) => {
-            return roles[key] === roleSelect.val();
-        })),
+        'first_name': firstNameInput.value,
+        'last_name': lastNameInput.value,
+        'status': statusInput.checked,
+        'role': roleSelect.value,
     };
     let emptyFields = false;
     let fields = document.querySelector('form#user-form').querySelectorAll('input, select');
@@ -175,70 +195,85 @@ saveButton.addEventListener('click', function (event) {
     }
     switch (currentAction) {
         case 'store':
-            $.ajax({
-                url: '/store_user.php',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify({user}),
-                success: function (data) {
-                    console.log(data);
-                    if (data.status) {
-                        let userData = {
-                            id: data.id,
-                            first_name: form.find('input#first-name').val(),
-                            last_name: form.find('input#last-name').val(),
-                            status: form.find('input#status').prop('checked'),
-                            role: form.find('select#role').val()
-                        }
 
-                        addUser(userData, table);
-                        updateUser(tBody.lastElementChild, userData);
-                        if (selectAllCheckbox.checked) {
-                            selectAllCheckboxes(tBody);
-                        }
-                    } else {
-                        formGeneralError.css("display", 'block');
-                        formGeneralError.text(data.error.message);
+            const responseStore = await fetch('/store_user.php', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "DataType": "json",
+                },
+                body: JSON.stringify({user}),
+            });
+            if (responseStore.ok) {
+                let json = await responseStore.json();
 
+                console.log(json);
+                if (json.status) {
+                    let userData = {
+                        id: json.id,
+                        first_name: form.querySelector('input#first-name').value,
+                        last_name: form.querySelector('input#last-name').value,
+                        status: form.querySelector('input#status').checked,
+                        role: json.role,
                     }
 
-                    userModal.modal('hide');
+                    addUser(userData, table);
+                    updateUser(tBody.lastElementChild, userData);
+                    if (selectAllCheckbox.checked) {
+                        selectAllCheckboxes(tBody);
+                    }
+                } else {
+                    formGeneralError.style.display = 'block';
+                    formGeneralError.innerText = json.error.message;
+
                 }
-            });
+
+                userModal.hide();
+            } else {
+                userModal.hide();
+                warningBody.innerText = "Error " + responseStore.status;
+                warningModal.show();
+            }
             break;
         case 'update':
             user.id = elementToUpdate.dataset.id;
-            $.ajax({
-                url: '/update_user.php',
-                method: 'post',
-                dataType: 'json',
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(user),
-                success: function (data) {
-                    console.log(data);
-                    if (data.status) {
-                        user.role = roles[user.role];
 
-                        updateUser(elementToUpdate, user);
-                        userModal.modal('hide');
-                        selectedElements = [];
 
-                    } else {
-                        formGeneralError.css("display", 'block');
-                        formGeneralError.text(data.error.message);
-
-                    }
-                }
+            const responseUpdate = await fetch('/update_user.php', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                    "DataType": "json",
+                },
+                body: JSON.stringify(user),
             });
+            if (responseUpdate.ok) {
+                let json = await responseUpdate.json();
+
+                console.log(json);
+                if (json.status) {
+                    updateUser(elementToUpdate, json.user);
+                    userModal.hide();
+                    selectedElements = [];
+
+                } else {
+                    formGeneralError.style.display = 'block';
+                    formGeneralError.innerText = json.error.message;
+
+                }
+            } else {
+                userModal.hide();
+                warningBody.innerText = "Error " + responseUpdate.status;
+                warningModal.show();
+            }
             break;
         default:
             break;
     }
 });
 
-warning.on('hidden.bs.modal', function () {
-    warningBody.text("");
+warning.addEventListener('hidden.bs.modal', function () {
+    warningBody.innerText = "";
 });
 
 Array.from(modals).forEach((modal) => {
@@ -251,160 +286,163 @@ Array.from(modals).forEach((modal) => {
 });
 
 
-userModal.on('shown.bs.modal', function (event) {
-    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('#error-message'));
-    let action = event.relatedTarget.id;
-    let form = userModal.find('form#user-form');
-    form.find('input#first-name').val("");
-    form.find('input#last-name').val("");
-    form.find('input#status').prop('checked', true);
-    form.find('select#role').val(0);
+userForm.addEventListener('show.bs.modal', function (event) {
+    hideFormErrors(document.querySelector('form#user-form').querySelectorAll('.error-message'));
+    let form = userForm.querySelector('form#user-form');
+    form.querySelector('input#first-name').value = "";
+    form.querySelector('input#last-name').value = "";
+    form.querySelector('input#status').checked = true;
+    form.querySelector('select#role').value = 0;
 
     const user = {};
-    if (action === 'user-store') {
-
-        currentAction = 'store';
-    } else if (action === 'user-update') {
-        let row = event.relatedTarget.closest('tr');
+    if (currentAction === 'update') {
+        let row = elementToUpdate.closest('tr');
 
         let data = [];
-        let full_name = row.querySelector('#first-name').innerText.split(' ');
-        let first_name = full_name[0];
-        let last_name = full_name[1];
-        form.find('input#first-name').val(first_name);
-        form.find('input#last-name').val(last_name);
-        form.find('input#status').prop('checked', row.querySelector('#status[fill]').getAttribute('fill') === 'green');
-        form.find('select#role').val(row.querySelector('#role').innerText);
+        let first_name = row.dataset.firstName;
+        let last_name = row.dataset.lastName;
+        if(!first_name || !last_name){
+            let formGeneralError = document.querySelector(".error-message.general");
+            formGeneralError.style.display = 'block';
+            formGeneralError.innerText = "Invalid user table";
+            warningBody.innerText = "Invalid user table";
+            warning.show();
+            return;
+        }
 
-
-        currentAction = 'update';
-        elementToUpdate = event.relatedTarget.closest('tr');
-
+        form.querySelector('input#first-name').value = first_name;
+        form.querySelector('input#last-name').value = last_name;
+        form.querySelector('input#status').checked = row.querySelector('.status').classList.contains('active');
+        form.querySelector('select#role').value = row.dataset.roleId;
     }
 });
 groupActionsButtons.forEach(function (button) {
 
-    let groupActions = button.parentNode.querySelector("#group-actions");
-    button.addEventListener('click', function (event) {
+    let groupActions = button.parentNode.querySelector(".group-actions");
+    button.addEventListener('click', async function (event) {
         if (tBody.querySelectorAll('input:checked').length <= 0) {
-            let warningBody = $('#warning-modal #modal-body');
-            warningBody.text("User not selected");
-            warning.modal('show');
+            warningBody.innerText = "User not selected";
+            warningModal.show();
             return;
         }
         if (!Number.isInteger(+groupActions.value)) {
-            let warningBody = $('#warning-modal #modal-body');
-            warningBody.text("Action not selected");
-            warning.modal('show');
+            warningBody.innerText = "Action not selected";
+            warningModal.show();
             return;
         }
+
         selectedElements = [];
 
         tBody.querySelectorAll('input:checked').forEach(function (item) {
             selectedElements.push(item.closest('tr'));
+            selectedIds.push(item.closest('tr').dataset.id);
         });
 
         let users = [];
         switch (+groupActions.value) {
             case 1:
                 selectedElements.forEach((item) => {
-
                     let id = item.dataset.id;
-
-
-                    let status = item.querySelector('td svg#status');
-
-
                     let user = {
                         id,
                         status: true,
                     };
                     users.push(user);
-
                 });
-                $.ajax({
-                    url: '/update_user_status.php',
-                    method: 'post',
-                    dataType: 'json',
-                    contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify({users}),
-                    success: function (data) {
-                        console.log(data)
-                        if (data.status) {
-                            selectedElements.forEach(function (user) {
-                                user.querySelector('#status').setAttribute('fill', 'green');
 
-                            });
-                        } else {
-                            warningBody.text(data.error.message);
-                            warning.modal("show");
-                        }
+                const responseUpdateActive = await fetch('/update_user_status.php', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json; charset=utf-8",
+                        "DataType": "json",
+                    },
+                    body: JSON.stringify({users}),
+                });
+                if (responseUpdateActive.ok) {
+                    let json = await responseUpdateActive.json();
 
-                        userModal.modal('hide');
-                    }, complete: function () {
+                    console.log(json)
+                    if (json.status) {
+                        selectedElements.forEach(function (user) {
+                            let status = user.querySelector('.status');
+                            status.classList.remove('inactive');
+                            status.classList.add('active');
 
-                        selectedElements = [];
+
+                        });
+                    } else {
+                        warningBody.innerText = json.error.message;
+                        warningModal.show();
                     }
 
-                });
-
+                    userModal.hide();
+                } else {
+                    userModal.hide();
+                    warningBody.innerText = "Error " + responseUpdateActive.status;
+                    warningModal.show();
+                }
+                selectedElements = [];
+                selectedIds = [];
 
                 break;
             case 2:
                 selectedElements.forEach((item) => {
-
                     let id = item.dataset.id;
-
-
-                    let status = item.querySelector('td svg#status');
-
                     let user = {
                         id,
                         status: false,
                     };
                     users.push(user);
-
                 });
-                $.ajax({
-                    url: '/update_user_status.php',
-                    method: 'post',
-                    dataType: 'json',
-                    contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify({users}),
-                    success: function (data) {
-                        console.log(data)
-                        if (data.status) {
-                            selectedElements.forEach(function (user) {
-                                user.querySelector('#status').setAttribute('fill', 'gray');
-
-                            });
-
-                        } else {
-                            warningBody.text(data.error.message);
-                            warning.modal("show");
-                        }
 
 
-                        userModal.modal('hide');
-                    }, complete: function () {
+                const responseUpdateInactive = await fetch('/update_user_status.php', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json; charset=utf-8",
+                        "DataType": "json",
+                    },
+                    body: JSON.stringify({users}),
+                });
+                if (responseUpdateInactive.ok) {
+                    let json = await responseUpdateInactive.json();
 
-                        selectedElements = [];
+                    console.log(json)
+                    if (json.status) {
+                        selectedElements.forEach(function (user) {
+                            let status = user.querySelector('.status');
+                            status.classList.remove('active');
+                            status.classList.add('inactive');
+
+
+                        });
+                    } else {
+                        warningBody.innerText = json.error.message;
+                        warningModal.show();
                     }
-                });
+
+                    userModal.hide();
+                } else {
+                    userModal.hide();
+                    warningBody.innerText = "Error " + responseUpdateInactive.status;
+                    warningModal.show();
+                }
+                selectedElements = [];
+                selectedIds = [];
                 break;
             case 3:
-                $('#delete-confirm-modal').modal('show');
-
+                selectedElements.push()
+                deleteConfirmModal.show();
                 break;
             default:
-                console.log('unknown option')
+                console.log('Unknown option');
                 break;
         }
     });
 
 });
-const updateCheckboxes = function (tBody){
-    if(allCheckboxesSelected(tBody))
+const updateCheckboxes = function (tBody) {
+    if (allCheckboxesSelected(tBody))
         selectAllCheckbox.checked = true;
     else
         selectAllCheckbox.checked = false;
@@ -423,10 +461,13 @@ const selectAllCheckboxes = function (tBody) {
 }
 
 const updateUser = function (element, user) {
-
-    element.querySelector('#first-name').innerText = user.first_name + " " + user.last_name;
-    element.querySelector('#status').setAttribute('fill', Boolean(user.status) === true ? 'green' : 'gray');
-    element.querySelector('#role').innerText = user.role;
+    let status = element.querySelector('.status');
+    element.dataset.firstName = user.first_name;
+    element.dataset.lastName = user.last_name;
+    element.querySelector('.name').innerText = element.dataset.firstName + " " + element.dataset.lastName;
+    status.classList.remove('active', 'inactive');
+    status.classList.add(Boolean(user.status) === true ? 'active' : 'inactive');
+    element.querySelector('.role').innerText = user.role.name;
 
 
 }
@@ -435,24 +476,23 @@ const addUser = function (data, table) {
 
     let elem = document.createElement('tr');
     elem.setAttribute('data-id', data['id']);
+    elem.setAttribute('data-first-name', data['first_name']);
+    elem.setAttribute('data-last-name', data['last_name']);
+    elem.setAttribute('data-role-id', data.role.id);
     elem.innerHTML = `
         <th scope="row">
             <input class="form-check-input" type="checkbox">
         </th>
-        <td id="first-name">${data['first_name']} ${data['last_name']}</td>
-        <td>
-            <svg xmlns="http://www.w3.org/2000/svg"  id="status" width="16" height="16" fill="${data['status'] ? 'green' : 'gray'}" class="bi bi-circle-fill">
-                <circle cx="7" cy="7" r="7"/>
-            </svg>
-        </td>
-        <td id="role">${data['role']}</td>
-        <td>
-            <i class="fas fa-edit" data-bs-toggle="modal"
-                       data-bs-target="#user-modal" data-action="edit" id="user-update" style="font-size:24px"></i>
-
-                    <i class="fa-solid fa-trash " data-bs-toggle="modal"
-                       data-bs-target="#delete-confirm-modal" data-action="delete" id="user-delete" style="font-size:24px"></i>
-        </td>
+        <td class="name">${elem.dataset.firstName} ${elem.dataset.lastName}</td>
+         <td>
+                    <span class='status ${data.status ? 'active' : 'inactive'}'></span>
+                </td>
+        <td class="role">${data.role.name}</td>
+        
+           <td><i class="fas fa-edit" id="user-update"></i>
+                    <i class="fa-solid fa-trash" id="user-delete"></i>
+                </td>
+       
     `;
 
     tBody.appendChild(elem);

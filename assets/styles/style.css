@@ -1,6 +1,18 @@
-i[data-action]{
+i#user-delete, i#user-update{
     cursor: pointer;
 }
 .fa-edit, .fa-trash{
     font-size:24px;
+}
+.active{
+    background: green;
+}
+.inactive{
+    background: gray;
+}
+.status{
+    width: 15px;
+    height: 15px;
+    border-radius: 50px;
+    display: inline-block;
 }

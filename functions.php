@@ -31,6 +31,7 @@ function getAllUsers()
     $users = [];
     $result = $connection->query("Select * from users;");
     while ($user = $result->fetch(PDO::FETCH_ASSOC)) {
+        $user['role'] = ['id' => $user['role'], 'name' => getAllRoles()[$user['role']]];
         $users[] = $user;
     }
     return $users;

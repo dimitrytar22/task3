@@ -1,8 +1,6 @@
 <?php
 require_once "functions.php";
 $users = getAllUsers();
-$roles = getAllRoles();
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +9,6 @@ $roles = getAllRoles();
     <title>Title</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="assets/styles/style.css">
@@ -28,19 +25,19 @@ $roles = getAllRoles();
                 </div>
                 <div class="modal-body">
                     <form id="user-form">
-                        <div class="text-danger error-message general" id="error-message">
+                        <div class="text-danger error-message general">
                         </div>
                         <div class="mb-3">
                             <label for="first-name" class="col-form-label">First Name:</label>
                             <input type="text" class="form-control" id="first-name">
-                            <div class="text-danger" id="error-message" inert>
+                            <div class="text-danger error-message" >
 
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="last-name" class="col-form-label">Last Name:</label>
                             <input type="text" class="form-control" id="last-name">
-                            <div class="text-danger" id="error-message" inert>
+                            <div class="text-danger error-message" >
 
                             </div>
                         </div>
@@ -54,10 +51,10 @@ $roles = getAllRoles();
                             <label for="role" class="col-form-label">Role:</label>
                             <select class="w-50 form-select" aria-label="Default select example" id="role">
                                 <option selected value="0">Please select</option>
-                                <option>Admin</option>
-                                <option>User</option>
+                                <option value="1">Admin</option>
+                                <option value="2">User</option>
                             </select>
-                            <div class="text-danger" id="error-message" inert>
+                            <div class="text-danger error-message">
 
                             </div>
                         </div>
@@ -74,18 +71,17 @@ $roles = getAllRoles();
     <div class="container">
         <div class="row align-items-center justify-content-between">
             <div class="col-auto">
-                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#user-modal"
-                        id="user-store">Add
+                <button class="btn btn-primary user-store" type="button">Add
                 </button>
             </div>
             <div class="col-auto d-flex gap-2">
-                <select class="form-select w-auto" id="group-actions">
+                <select class="form-select w-auto group-actions">
                     <option selected>Please select</option>
                     <option value="1">Set active</option>
                     <option value="2">Set not active</option>
                     <option value="3">Delete</option>
                 </select>
-                <button class="btn btn-primary" type="button" id="group-actions-button">Ok</button>
+                <button class="btn btn-primary group-actions-button" type="button" >Ok</button>
             </div>
         </div>
     </div>
@@ -147,28 +143,19 @@ $roles = getAllRoles();
 
         foreach ($users as $user) {
             ?>
-            <tr data-id="<?= $user['id'] ?>">
+            <tr data-id="<?= $user['id'] ?>" data-first-name="<?=$user['first_name']?>" data-last-name="<?=$user['last_name']?>" data-role-id="<?= $user['role']['id'] ?>">
 
                 <th scope="row">
-                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                    <input class="form-check-input" type="checkbox" >
 
                 </th>
-                <td id="first-name"><?= "$user[first_name]  $user[last_name]" ?></td>
+                <td class="name"><?= "$user[first_name]  $user[last_name]" ?></td>
                 <td>
-                    <svg xmlns="http://www.w3.org/2000/svg" id="status" width="16" height="16"
-                         fill="<?= $user['status'] == 1 ? 'green' : 'gray' ?>"
-                         class="bi bi-circle-fill"
-                         viewBox="0 0 16 16">
-                        <circle cx="7" cy="7" r="7"/>
-                    </svg>
+                    <span class="status <?= $user['status'] == 1 ? 'active' : 'inactive' ?>"></span>
                 </td>
-                <td id="role"><?= $roles[$user['role']] ?></td>
-                <td><i class="fas fa-edit" data-bs-toggle="modal"
-                       data-bs-target="#user-modal" data-action="edit" id="user-update"></i>
-
-                    <i class="fa-solid fa-trash" data-bs-toggle="modal"
-                       data-bs-target="#delete-confirm-modal" data-action="delete" id="user-delete"></i>
-
+                <td class="role"><?= $user['role']['name'] ?></td>
+                <td><i class="fas fa-edit" id="user-update"></i>
+                    <i class="fa-solid fa-trash" id="user-delete"></i>
                 </td>
             </tr>
             <?php
@@ -178,24 +165,25 @@ $roles = getAllRoles();
 
         </tbody>
     </table>
-    <div class="container">
-        <div class="row align-items-center justify-content-between">
-            <div class="col-auto">
-                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#user-modal"
-                        id="user-store">Add
-                </button>
-            </div>
-            <div class="col-auto d-flex gap-2">
-                <select class="form-select w-auto" id="group-actions">
-                    <option selected>Please select</option>
-                    <option value="1">Set active</option>
-                    <option value="2">Set not active</option>
-                    <option value="3">Delete</option>
-                </select>
-                <button class="btn btn-primary" type="button" id="group-actions-button">Ok</button>
-            </div>
+
+<div class="container">
+    <div class="row align-items-center justify-content-between">
+        <div class="col-auto">
+            <button class="btn btn-primary user-store" type="button"
+                    >Add
+            </button>
+        </div>
+        <div class="col-auto d-flex gap-2">
+            <select class="form-select w-auto group-actions">
+                <option selected>Please select</option>
+                <option value="1">Set active</option>
+                <option value="2">Set not active</option>
+                <option value="3">Delete</option>
+            </select>
+            <button class="btn btn-primary group-actions-button" type="button" >Ok</button>
         </div>
     </div>
+</div>
 
 </div>
 <script src="assets/js/script.js"></script>

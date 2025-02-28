@@ -14,6 +14,7 @@ if (empty($data)) {
     echo json_encode($response);
     exit;
 }
+$roles = getAllRoles();
 $user = $data['user'];
 $userFields = [
     'first_name' => htmlspecialchars(trim($user['first_name'])) ?? null,
@@ -34,6 +35,7 @@ $response = [
     'status' => (bool)$userId,
     'error' => !((bool)$userId) ? ['code' => 100, 'message' => 'user not created'] : null,
     'id' => $userId ?: null,
+    'role' => ['id' => $userFields['role'], 'name' => $roles[$userFields['role']]],
 ];
 
 echo json_encode($response);

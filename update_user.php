@@ -39,7 +39,7 @@ if ($emptyFieldsExist) {
 }
 
 $result = updateUser($dataFields);
-
+$dataFields['role'] = ['id' => $dataFields['role'], $roles, 'name' => $roles[$dataFields['role']]];;
 echo json_encode([
     'status' => (bool)$result,
     'error' => !$result ? ['code' => 100, 'message' => 'User not updated'] : null,
